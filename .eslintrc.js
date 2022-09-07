@@ -23,6 +23,7 @@ module.exports = {
     'no-return-assign': 'off',
     'import/no-self-import': 'off',
     'import/no-extraneous-dependencies': 'off',
+    'react/require-default-props': 'off',
     'react/function-component-definition': [
       2,
       { namedComponents: ['arrow-function', 'function-declaration'] },

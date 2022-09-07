@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { extend, useFrame } from '@react-three/fiber';
 import React, { memo, useRef } from 'react';
 import { shaderMaterial, useTexture } from '@react-three/drei';
-import { Vector3, Vector4 } from 'three';
+import { BackSide, Vector3, Vector4 } from 'three';
 import dynamic from 'next/dynamic';
 import fake_uv from '../../../../public/three/glitchalpha.png';
 import vertex from './glsl/glitch.vert';
@@ -13,13 +13,14 @@ const GlitchMaterial = shaderMaterial(
   {
     u_glitchalpha_texture: null,
     u_time: 0,
+    u_opacity: 0.9,
     u_color: new Vector4(0, 1, 0, 1),
     u_hue_color: new Vector3(0.5, 0, 0),
     u_light_dir: new Vector3(0, -5, 0),
     u_light_color: new Vector4(0, 0, 0, 0),
   },
   vertex,
-  fragment,
+  fragment
 );
 
 // This is the 🔑 that HMR will renew if this file is edited
@@ -41,22 +42,27 @@ const GlitchShader = memo(
     });
 
     return (
-      <RhombicDodecaedron ref={meshRef} detail={0} {...props}>
+      <RhombicDodecaedron ref={meshRef} detail={0} position={[0, 0, 0]} {...props}>
         {/* @ts-ignore */}
         <glitchMaterial
           key={GlitchMaterial.key}
           blending={THREE.AdditiveBlending}
+          side={BackSide}
+          renderOrder={1}
           uniforms={{
             u_glitchalpha_texture: { value: glitchTexture },
             u_time: { value: 0 },
-            u_hue_color: { value: new Vector3(1, 0.0, 0.7) },
+            u_opacity: { value: 0 },
+            u_hue_color: { value: new Vector3(0, 0.0, 0.0) },
           }}
         />
       </RhombicDodecaedron>
     );
   },
-  () => true,
+  () => true
 );
 
 export default GlitchShader;
-export const DynamicGlitchShader = dynamic<any>(() => import('./component').then((mod) => mod.default));
+export const DynamicGlitchShader = dynamic<any>(() =>
+  import('./component').then((mod) => mod.default)
+);

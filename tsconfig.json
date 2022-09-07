@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js", "x-declaration.d.ts"],
   "exclude": ["node_modules"]
 }

@@ -11,6 +11,7 @@ uniform vec4 u_light_color;
 uniform vec3 u_hue_color;
 uniform float u_alpha_threshold;
 uniform sampler2D u_glitchalpha_texture;
+uniform float u_opacity;
 
 mat3 computeTBN(){
       vec3 dp1 = dFdx( v_pos );
@@ -100,5 +101,5 @@ void main() {
       vec3 specular_color = u_light_color.xyz * specular_light;
       vec3 refraction_color = vec3(0.0);
       vec3 emission = vec3(0.0);
-      gl_FragColor = vec4( (emission + refraction_color + specular_color + (ambient_light + diffuse_light) *( diffuse_color - u_color.xyz) / mul_124) + u_hue_color , 1.0 );
+      gl_FragColor = vec4( (emission + refraction_color + specular_color + (ambient_light + diffuse_light) *( diffuse_color - u_color.xyz) / mul_124) + u_hue_color , 1.0 + (-1.0 * u_opacity) );
 }

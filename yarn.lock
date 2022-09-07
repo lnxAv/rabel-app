@@ -8046,6 +8046,11 @@
     "potpack" "^1.0.1"
     "zstddec" "^0.0.2"
 
+"three.meshline@^1.4.0":
+  "integrity" "sha512-A8IsiMrWP8zmHisGDAJ76ZD7t/dOF/oCe/FUKNE6Bu01ZYEx8N6IlU/1Plb2aOZtAuWM2A8s8qS3hvY0OFuvOw=="
+  "resolved" "https://registry.npmjs.org/three.meshline/-/three.meshline-1.4.0.tgz"
+  "version" "1.4.0"
+
 "three@*", "three@^0.143.0", "three@>= 0.123.0", "three@>=0.103.0", "three@>=0.122.0", "three@>=0.126", "three@>=0.133", "three@>=0.137":
   "integrity" "sha512-oKcAGYHhJ46TGEuHjodo2n6TY2R6lbvrkp+feKZxqsUL/WkH7GKKaeu6RHeyb2Xjfk2dPLRKLsOP0KM2VgT8Zg=="
   "resolved" "https://registry.npmjs.org/three/-/three-0.143.0.tgz"

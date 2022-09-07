@@ -1,32 +1,37 @@
-import React from 'react';
+import { OrbitControls } from '@react-three/drei';
+import { extend, ReactThreeFiber } from '@react-three/fiber';
+import { MeshLine, MeshLineMaterial } from 'meshline';
+import React, { useEffect } from 'react';
+
+import Globe from '../../@components/r3fObjects/globe';
 import { XR3f } from '../x-page';
 
-const R3f: XR3f<any> = () => {
-  const x = 4;
-  return <mesh key={x}>{x}</mesh>;
-};
+extend({ MeshLine, MeshLineMaterial });
 
-R3f.motion = {
-  initial: {
-    y: 0,
-    x: -5,
-    scale: 0,
-  },
-  animate: {
-    y: 0,
-    x: 0,
-    scale: 1,
-  },
-  exit: {
-    x: 5,
-    y: 1,
-    scale: 0,
-  },
+/* eslint-disable no-unused-vars */
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      meshLine: ReactThreeFiber.Object3DNode<MeshLine, typeof MeshLine>;
+      meshLineMaterial: ReactThreeFiber.Object3DNode<MeshLineMaterial, typeof MeshLineMaterial>;
+    }
+  }
+}
+/* eslint-enable no-unused-vars */
+
+const R3f: XR3f<any> = () => {
+  useEffect(() => {});
+  return (
+    <>
+      <OrbitControls enableZoom={false} position={[0, 0, 0]} />
+      <Globe />
+    </>
+  );
 };
 
 R3f.scrollControls = {
   pages: 2,
-  damping: 4,
+  damping: 10,
 };
 
 export default R3f;
