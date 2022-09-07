@@ -3,7 +3,6 @@ import { extend, ReactThreeFiber, useFrame } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
-
 import CartesianShader from '../../@styles/shader/cartesian/component';
 
 extend({ MeshLine, MeshLineMaterial });
@@ -72,6 +71,7 @@ const DemiSphere = () => {
         widthCallback={(p: number) =>
           animatedWidth(num, p, 0.02, Math.random() * 2, Math.random() * 0.03)
         }
+        // @ts-ignore --Vector3 are best for this useCase
         points={points}
       />
       <meshLineMaterial
