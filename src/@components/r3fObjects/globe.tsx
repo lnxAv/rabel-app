@@ -1,9 +1,10 @@
-import { Sphere } from '@react-three/drei';
+import { Html, Sphere } from '@react-three/drei';
 import { extend, ReactThreeFiber, useFrame } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useRef, useState } from 'react';
-import { Vector3 } from 'three';
+
 import CartesianShader from '../../@styles/shader/cartesian/component';
+import AnimatedLine from './animatedLine';
 
 extend({ MeshLine, MeshLineMaterial });
 
@@ -27,23 +28,16 @@ const sg = {
   thetaLength: Math.PI,
 };
 
-const DemiSphere = () => {
+const Globe = () => {
   const [num, setNum] = useState<number>(0);
-  const ref = useRef<MeshLine>(null);
-  // Thank you Mr. doob
-  const resolution = 100;
-  const amplitude = 1.3;
-  const size = 180 / resolution;
-  const points = [];
-  for (let i = 0; i <= resolution; i += 1) {
-    const segment = (i * size * Math.PI) / 180;
-    points.push(new Vector3(Math.cos(segment) * amplitude, 0, Math.sin(segment) * amplitude));
-  }
+  const ref = useRef(null);
+  // const camera = useThree((state) => state.camera);
+  useEffect(() => {});
   useFrame((time) => {
     const normaled = parseFloat(((Math.cos(time.clock.elapsedTime / 2) - 0) / (1 - 0)).toFixed(2));
     setNum(normaled <= 0 ? 1 + normaled : normaled);
   });
-  const animatedWidth = (
+  const animatedLineWidth = (
     value: number,
     check: number,
     precision: number,
@@ -62,34 +56,6 @@ const DemiSphere = () => {
     const newWidth = width * Math.cos(distancePercentage);
     return newWidth;
   };
-
-  return (
-    <mesh scale={1} rotation={[0, 0, -Math.PI / 2]} position={[0, 0, 0]}>
-      <meshLine
-        ref={ref}
-        attach="geometry"
-        widthCallback={(p: number) =>
-          animatedWidth(num, p, 0.02, Math.random() * 2, Math.random() * 0.03)
-        }
-        // @ts-ignore --Vector3 are best for this useCase
-        points={points}
-      />
-      <meshLineMaterial
-        attach="material"
-        transparent
-        depthTest={false}
-        lineWidth={0.1}
-        color="red"
-        opacity={0.8}
-        dashArray={0}
-        dashRatio={0}
-      />
-    </mesh>
-  );
-};
-
-const Globe = () => {
-  useEffect(() => {});
   return (
     <group>
       <mesh rotation={[0, -0.6, 0]}>
@@ -97,8 +63,61 @@ const Globe = () => {
         <Sphere scale={1} position={[0, 0, 0]} args={[...Object.values(sg)]}>
           <CartesianShader u={{ hue: [255, 0, 0], sharpness: 1 }} />
         </Sphere>
-        <DemiSphere />
-        {/* @ts-ignore */}
+        <AnimatedLine
+          amplitude={1.3}
+          angle={180}
+          scale={1}
+          rotation={[0, 0, -Math.PI / 2]}
+          position={[0, 0, 0]}
+          color="red"
+          opacity={0.6}
+          dashArray={0.01}
+          dashRatio={0.5}
+          widthCallback={(p: number) =>
+            animatedLineWidth(num, p, 0.01, Math.random() * 0.2, Math.random() * 0.01)
+          }
+        />
+        <Html scale={0.22} position={[0, 0, 1]} transform>
+          <div
+            style={{
+              border: '1px solid red',
+              padding: '2px',
+              borderBottom: '0',
+              width: '200px',
+              zIndex: '0',
+            }}
+          >
+            <p> L0_D1ng_hc</p>
+          </div>
+          <div style={{ border: '1px solid red', padding: '5px' }}>
+            <p>h001 000-xxx-442 hc_001</p>
+            <p>h001 000-xxx-442 hc_001</p>
+            <p>h001 000-xxx-442 hc_001</p>
+          </div>
+        </Html>
+        <mesh ref={ref} position={[0, 1, 1]}>
+          <Html
+            scale={0.22}
+            transform
+            style={{ border: '0.5px solid red', padding: '2px', width: '200px', zIndex: '0' }}
+          >
+            <div
+              style={{
+                padding: '2px',
+                borderBottom: '0',
+                width: '200px',
+                zIndex: '0',
+              }}
+            >
+              <p> L0_D1ng_hc</p>
+            </div>
+            <div style={{ border: '0.5px solid red', padding: '5px' }}>
+              <p>h001 000-xxx-442 hc_001</p>
+              <p>h001 000-xxx-442 hc_001</p>
+              <p>h001 000-xxx-442 hc_001</p>
+            </div>
+          </Html>
+        </mesh>
       </mesh>
     </group>
   );
