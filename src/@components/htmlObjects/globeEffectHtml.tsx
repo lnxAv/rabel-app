@@ -21,6 +21,11 @@ const openingAnimationHead = keyframes`
 `;
 
 const breathingText = keyframes`
+ 0% { opacity: 0.1;}
+ 50% { opacity: 0.8;}
+ 100% {opacity: 0.1;}
+`;
+const breathingTextRotate = keyframes`
  0% { opacity: 0.1;transform: rotate(0deg);}
  50% { opacity: 0.8;}
  100% {opacity: 0.1; transform: rotate(180deg)}
@@ -72,12 +77,32 @@ const BreathingBox = styled.div`
   padding: 0;
   height: auto;
   width: auto;
+  p {
+    animation: ${breathingText} 1.5s ease-in infinite;
+  }
   &.rotate {
     p {
-      animation: ${breathingText} 1.5s ease-in infinite;
+      animation: ${breathingTextRotate} 1.5s ease-in infinite;
     }
   }
 `;
+
+const ShapeBox = styled.div`
+  div.circle {
+    border-radius: 35px;
+    border: 1px solid red;
+    width: auto;
+    height: auto;
+    content: ' ';
+  }
+  div.square {
+    border: 1px solid red;
+    width: auto;
+    height: auto;
+    content: ' ';
+  }
+`;
+
 const Loading = ({ title }: { title: string }) => (
   <p style={{ display: 'flex' }}>
     {' '}
@@ -92,7 +117,7 @@ const Loading = ({ title }: { title: string }) => (
     </span>
   </p>
 );
-const TypeWriting = ({ timedLines = [] }: UIProps) => {
+export const TypeWriting = ({ timedLines = [] }: UIProps) => {
   const [toggleCursor, setToggleCursor] = useState(false);
 
   const ok = useCallback(() => setToggleCursor(true), []);
@@ -130,26 +155,69 @@ export const TypePlus = ({ size, rotate }: { size: number; rotate?: boolean }) =
   </BreathingBox>
 );
 
+export const TypeDots = ({ size }: { size: number }) => (
+  <ShapeBox>
+    <div className="circle" style={{ width: `${size}px`, height: `${size}px` }} />
+  </ShapeBox>
+);
+
+export const TypeMultipleDots = ({ size }: { size: number }) => (
+  <ShapeBox
+    style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      width: `${size}px`,
+      height: `${size}px`,
+    }}
+  >
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+    <div className="circle" style={{ width: '28%', height: '28%', margin: '2%' }} />
+  </ShapeBox>
+);
+
+export const TypeSquareDots = ({ size }: { size: number }) => (
+  <ShapeBox
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      flexWrap: 'wrap',
+      width: `${size}px`,
+      height: `${size}px`,
+    }}
+  >
+    <div className="circle" style={{ width: '30%', height: '30%', margin: '10%' }} />
+    <div className="circle" style={{ width: '30%', height: '30%', margin: '10%' }} />
+    <div className="square" style={{ width: '100%', height: '100%' }} />
+  </ShapeBox>
+);
+
 const GlobeEffectHtml = ({ ...props }: Props) => {
   useEffect(() => {}, []);
+  function randomNumber(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  const getRandomComponent = () => {
+    const select = randomNumber(1, 2);
+    switch (select) {
+      case 1:
+        return <TypeDots size={8} />;
+      case 2:
+        return <TypePlus size={15} rotate={!!randomNumber(0, 1)} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <BodyBox className="windowed">
+    <BodyBox className="">
       <div className="head-box">
         <Loading title={props.title} />
       </div>
-      <div className="body-box">
-        <TypeWriting
-          timedLines={[
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
-            { text: 'h001 000-xxx-442 hc_001;', time: 1000 },
-          ]}
-        />
-      </div>
+      <div className="body-box">{getRandomComponent()}</div>
     </BodyBox>
   );
 };

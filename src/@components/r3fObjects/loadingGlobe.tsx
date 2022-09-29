@@ -47,8 +47,8 @@ const LoadingGlobe = ({ phiLength, thetaLength }: Props) => {
       theta: Math.random() * phiLength,
     }),
     reserve: 5,
-    activeAtStart: 1,
-    limit: 10,
+    activeAtStart: 50,
+    limit: 50,
   });
 
   return (
