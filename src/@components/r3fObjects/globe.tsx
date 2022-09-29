@@ -1,6 +1,7 @@
 import { Sphere } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
-import React, { useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import React, { useEffect, useRef, useState } from 'react';
+import { GroupReffered } from '../../@helpers/types';
 
 import CartesianShader from '../../@styles/shader/cartesian/component';
 import AnimatedLine from './animatedLine';
@@ -18,11 +19,60 @@ const sg = {
 };
 
 const Globe = () => {
-  const [num, setNum] = useState<number>(0);
+  const globeRef = useRef<GroupReffered>(null);
+  const [vertical, setVertical] = useState<number>(0);
+  const verticalRef = useRef<number>(0);
+  const horizontalRef = useRef<number>(0);
+  const [startBlur, setStartBlur] = useState<boolean>(true);
+  const windowFocus = useRef<boolean>(false);
+  const { size } = useThree();
 
-  useFrame((time) => {
-    const normaled = parseFloat(((Math.cos(time.clock.elapsedTime / 2) - 0) / (1 - 0)).toFixed(2));
-    setNum(normaled <= 0 ? 1 + normaled : normaled);
+  const updateMouse = (e: any) => {
+    if (!windowFocus.current) {
+      windowFocus.current = true;
+    }
+    const newVertical = 1 - e.y / size.height;
+    const newHorizontal = 1 - e.x / size.width;
+    setVertical(newVertical);
+    globeRef.current.rotation.y = newHorizontal;
+    globeRef.current.rotation.x = newVertical;
+    horizontalRef.current = newHorizontal;
+  };
+
+  useEffect(() => {
+    const handleActivityFalse = () => {
+      setStartBlur(true);
+    };
+    const handleActivityTrue = () => {
+      windowFocus.current = true;
+      setStartBlur(false);
+    };
+
+    window.addEventListener('mousemove', updateMouse);
+    document.addEventListener('mouseout', handleActivityFalse);
+    document.addEventListener('visibilitychange', (e) =>
+      !e ? handleActivityFalse() : handleActivityTrue()
+    );
+    document.addEventListener('blur', handleActivityFalse);
+    document.addEventListener('focus', handleActivityTrue);
+  }, []);
+
+  const updateFrame = (delta: number) => {
+    verticalRef.current += 0.3 * delta;
+    verticalRef.current %= 1;
+    setVertical(verticalRef.current);
+    globeRef.current.rotation.y += 0.2 * delta;
+  };
+
+  useFrame((time, delta) => {
+    if (!windowFocus.current && !startBlur) {
+      updateFrame(delta);
+    } else if (startBlur) {
+      verticalRef.current = vertical;
+      setVertical(verticalRef.current);
+      windowFocus.current = false;
+      setStartBlur(false);
+    }
   });
 
   const animatedLineWidth = (
@@ -47,10 +97,13 @@ const Globe = () => {
   return (
     <group>
       <mesh rotation={[0, -0.6, 0]}>
-        {/* @ts-ignore */}
-        <Sphere scale={1} position={[0, 0, 0]} args={[...Object.values(sg)]}>
-          <CartesianShader u={{ hue: [255, 0, 0], sharpness: 1 }} />
-        </Sphere>
+        <group ref={globeRef}>
+          {/* @ts-ignore */}
+          <Sphere scale={1} position={[0, 0, 0]} args={[...Object.values(sg)]}>
+            <CartesianShader u={{ hue: [255, 0, 0], sharpness: 1 }} />
+          </Sphere>
+          <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
+        </group>
         <AnimatedLine
           amplitude={1.3}
           angle={180}
@@ -62,11 +115,10 @@ const Globe = () => {
           dashArray={0.01}
           dashRatio={0.5}
           widthCallback={(p: number) =>
-            animatedLineWidth(num, p, 0.01, Math.random() * 0.2, Math.random() * 0.01)
+            animatedLineWidth(vertical, p, 0.01, Math.random() * 0.2, Math.random() * 0.01)
           }
         />
       </mesh>
-      <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
     </group>
   );
 };
