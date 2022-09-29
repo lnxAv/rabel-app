@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useRef } from 'react';
 import { MeshReffered } from '../../@helpers/types';
 
-import LoadingHtml from '../htmlObjects/loadingHtml';
+import GlobeEffectHtml from '../htmlObjects/globeEffectHtml';
 import { PoolableComponent, PoolItemCreationProps, useObjectPool } from './pool';
 import { usePoolStore } from './poolStore';
 
@@ -33,8 +33,8 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
 
   return (
     <mesh ref={mesh}>
-      <Html key={context.key}>
-        <LoadingHtml title="> loading" />
+      <Html key={context.key} occlude>
+        <GlobeEffectHtml title="> loading" />
       </Html>
     </mesh>
   );

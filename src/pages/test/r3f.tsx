@@ -1,4 +1,4 @@
-import { OrbitControls } from '@react-three/drei';
+import { OrthographicCamera } from '@react-three/drei';
 import { extend, ReactThreeFiber } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect } from 'react';
@@ -23,7 +23,7 @@ const R3f: XR3f<any> = () => {
   useEffect(() => {});
   return (
     <>
-      <OrbitControls enableZoom={false} position={[0, 0, 0]} />
+      <OrthographicCamera />
       <Globe />
     </>
   );

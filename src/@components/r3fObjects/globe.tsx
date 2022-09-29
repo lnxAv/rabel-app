@@ -72,6 +72,8 @@ const Globe = () => {
       setVertical(verticalRef.current);
       windowFocus.current = false;
       setStartBlur(false);
+    } else {
+      setVertical((state) => state + 0.00001);
     }
   });
 
@@ -108,14 +110,20 @@ const Globe = () => {
           amplitude={1.3}
           angle={180}
           scale={1}
-          rotation={[0, 0, -Math.PI / 2]}
+          rotation={[0, Math.cos(horizontalRef.current) - 0.8, -Math.PI / 2]}
           position={[0, 0, 0]}
           color="red"
           opacity={0.6}
           dashArray={0.01}
           dashRatio={0.5}
           widthCallback={(p: number) =>
-            animatedLineWidth(vertical, p, 0.01, Math.random() * 0.2, Math.random() * 0.01)
+            animatedLineWidth(
+              vertical,
+              p,
+              0.01,
+              Math.sin(horizontalRef.current / 2 + 0.5) * 0.2,
+              Math.sin(horizontalRef.current / 2 + 0.5) * 0.01
+            )
           }
         />
       </mesh>

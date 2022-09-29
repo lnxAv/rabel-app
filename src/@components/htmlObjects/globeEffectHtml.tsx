@@ -20,25 +20,37 @@ const openingAnimationHead = keyframes`
  100% { width: 200px;}
 `;
 
+const breathingText = keyframes`
+ 0% { opacity: 0.1;transform: rotate(0deg);}
+ 50% { opacity: 0.8;}
+ 100% {opacity: 0.1; transform: rotate(180deg)}
+`;
+
 const BodyBox = styled.div`
   display: flex;
   flex-direction: column;
   div.head-box {
-    border: 1px solid red;
-    overflow: hidden;
-    padding: 2px;
-    border-bottom: 0;
-    width: 200px;
-    z-index: 0;
-    animation: ${openingAnimationHead} ${naturalDelay}ms linear 1;
+    display: none;
   }
-  div.body-box {
-    border: 1px solid red;
-    overflow: hidden;
+  &.windowed {
+    div.head-box {
+      display: flex;
+      border: 1px solid red;
+      overflow: hidden;
+      padding: 2px;
+      border-bottom: 0;
+      width: 200px;
+      z-index: 0;
+      animation: ${openingAnimationHead} ${naturalDelay}ms linear 1;
+    }
+    div.body-box {
+      border: 1px solid red;
+      overflow: hidden;
 
-    padding: 5px;
-    height: 90px;
-    animation: ${openingAnimationBody} ${naturalDelay}ms linear 1;
+      padding: 5px;
+      height: 90px;
+      animation: ${openingAnimationBody} ${naturalDelay}ms linear 1;
+    }
   }
 `;
 
@@ -55,6 +67,17 @@ const WritingBox = styled.div`
   }
 `;
 
+const BreathingBox = styled.div`
+  display: inline-block;
+  padding: 0;
+  height: auto;
+  width: auto;
+  &.rotate {
+    p {
+      animation: ${breathingText} 1.5s ease-in infinite;
+    }
+  }
+`;
 const Loading = ({ title }: { title: string }) => (
   <p style={{ display: 'flex' }}>
     {' '}
@@ -69,7 +92,7 @@ const Loading = ({ title }: { title: string }) => (
     </span>
   </p>
 );
-const Type1 = ({ timedLines = [] }: UIProps) => {
+const TypeWriting = ({ timedLines = [] }: UIProps) => {
   const [toggleCursor, setToggleCursor] = useState(false);
 
   const ok = useCallback(() => setToggleCursor(true), []);
@@ -101,15 +124,21 @@ const Type1 = ({ timedLines = [] }: UIProps) => {
   );
 };
 
-const LoadingHtml = ({ ...props }: Props) => {
+export const TypePlus = ({ size, rotate }: { size: number; rotate?: boolean }) => (
+  <BreathingBox className={`${rotate ? 'rotate' : ''}`}>
+    <p style={{ fontSize: `${size}px`, color: 'red' }}>+</p>
+  </BreathingBox>
+);
+
+const GlobeEffectHtml = ({ ...props }: Props) => {
   useEffect(() => {}, []);
   return (
-    <BodyBox>
+    <BodyBox className="windowed">
       <div className="head-box">
         <Loading title={props.title} />
       </div>
       <div className="body-box">
-        <Type1
+        <TypeWriting
           timedLines={[
             { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
             { text: 'h001 000-xxx-442 hc_001; \n', time: 1000 },
@@ -125,4 +154,4 @@ const LoadingHtml = ({ ...props }: Props) => {
   );
 };
 
-export default LoadingHtml;
+export default GlobeEffectHtml;
