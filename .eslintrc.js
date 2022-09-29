@@ -24,6 +24,8 @@ module.exports = {
     'import/no-self-import': 'off',
     'import/no-extraneous-dependencies': 'off',
     'react/require-default-props': 'off',
+    'no-plusplus': 'off',
+    'no-else-return': 'off',
     'react/function-component-definition': [
       2,
       { namedComponents: ['arrow-function', 'function-declaration'] },

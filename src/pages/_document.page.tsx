@@ -1,5 +1,10 @@
-import {
-  Head, Html, Main, NextScript,
+import Document, {
+  Head,
+  Html,
+  Main,
+  NextScript,
+  DocumentContext,
+  DocumentInitialProps,
 } from 'next/document';
 import React from 'react';
 
@@ -42,39 +47,13 @@ function DocumentHead() {
       <meta name="theme-color" content="#000000" />
       {/* Link Meta Tags */}
       <link rel="apple-touch-icon" href="/icons/touch-icon-iphone.png" />
-      <link
-        rel="apple-touch-icon"
-        sizes="152x152"
-        href="/icons/touch-icon-ipad.png"
-      />
-      <link
-        rel="apple-touch-icon"
-        sizes="180x180"
-        href="/icons/touch-icon-iphone-retina.png"
-      />
-      <link
-        rel="apple-touch-icon"
-        sizes="167x167"
-        href="/icons/touch-icon-ipad-retina.png"
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href="/icons/favicon-32x32.png"
-      />
-      <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href="/icons/favicon-16x16.png"
-      />
+      <link rel="apple-touch-icon" sizes="152x152" href="/icons/touch-icon-ipad.png" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/icons/touch-icon-iphone-retina.png" />
+      <link rel="apple-touch-icon" sizes="167x167" href="/icons/touch-icon-ipad-retina.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
       <link rel="manifest" href="/manifest.json" />
-      <link
-        rel="mask-icon"
-        href="/icons/safari-pinned-tab.svg"
-        color="#5bbad5"
-      />
+      <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5" />
       <link rel="shortcut icon" href="/favicon.ico" />
       {/* Twitter Meta Tags */}
       <meta name="twitter:card" content="summary" />
@@ -92,10 +71,7 @@ function DocumentHead() {
       <meta property="og:description" content={description} />
       <meta property="og:site_name" content={titleDefault} />
       <meta property="og:url" content={url} />
-      <meta
-        property="og:image"
-        content="https://yourdomain.com/icons/apple-touch-icon.png"
-      />
+      <meta property="og:image" content="https://yourdomain.com/icons/apple-touch-icon.png" />
 
       {/* apple splash screen images */}
       {/*
@@ -113,20 +89,37 @@ function DocumentHead() {
   );
 }
 
-export default function Document() {
-  return (
-    <Html>
-      <DocumentHead />
-      <body>
-        <Main />
-        <NextScript />
-        <div id="globalLoader">
-          <div className="loader">
-            <div />
-            <div />
+export default class MyDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
+    const originalRenderPage = ctx.renderPage;
+    ctx.renderPage = () =>
+      originalRenderPage({
+        // Useful for wrapping the whole react tree
+        enhanceApp: (App) => App,
+        // Useful for wrapping in a per-page basis
+        enhanceComponent: (Component) => Component,
+      });
+    const initialProps = await Document.getInitialProps(ctx);
+    // Run the React rendering logic synchronously
+
+    return initialProps;
+  }
+
+  render() {
+    return (
+      <Html>
+        <DocumentHead />
+        <body>
+          <Main />
+          <NextScript />
+          <div id="globalLoader">
+            <div className="loader">
+              <div />
+              <div />
+            </div>
           </div>
-        </div>
-      </body>
-    </Html>
-  );
+        </body>
+      </Html>
+    );
+  }
 }
