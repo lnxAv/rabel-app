@@ -3,8 +3,8 @@ export default `
 body{
 display: block;
 overflow: hidden;
-
 }
+
 #globalLoader{
     position: fixed;
     z-index: 2147483647;
@@ -22,29 +22,22 @@ overflow: hidden;
     overflow: hidden;
 }
 .loader {
- --clr: #3498db;
  /* color of spining  */
  width: 50px;
  height: 50px;
  position: relative;
-}
-.loader div:nth-child(1), .loader div:nth-child(2) {
- content: "";
- position: absolute;
- top: -10px;
- left: -10px;
- width: 100%;
- height: 100%;
- border-radius: 100%;
- border: 10px solid transparent;
- border-top-color: var(--clr);
-}
-.loader div:nth-child(1) {
- z-index: 100;
+ background:
+ linear-gradient(to right, red 4px, transparent 4px) 0 0,
+ linear-gradient(to right, red 4px, transparent 4px) 0 100%,
+ linear-gradient(to left,red 4px, transparent 4px) 100% 0,
+ linear-gradient(to left, red 4px, transparent 4px) 100% 100%,
+ linear-gradient(to bottom, red 4px, transparent 4px) 0 0,
+ linear-gradient(to bottom, red 4px, transparent 4px) 100% 0,
+ linear-gradient(to top, red 4px, transparent 4px) 0 100%,
+ linear-gradient(to top, red 4px, transparent 4px) 100% 100%;
+ background-repeat: no-repeat;
+ background-size: 15px 15px;
  animation: spin 1s infinite;
-}
-.loader div:nth-child(2) {
- border: 10px solid #ccc;
 }
 @keyframes spin {
  0% {

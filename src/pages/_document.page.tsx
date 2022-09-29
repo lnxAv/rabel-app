@@ -1,12 +1,13 @@
 import Document, {
+  DocumentContext,
+  DocumentInitialProps,
   Head,
   Html,
   Main,
   NextScript,
-  DocumentContext,
-  DocumentInitialProps,
 } from 'next/document';
 import React from 'react';
+import { ServerStyleSheet } from 'styled-components';
 
 import manifest from '../../manifest.json';
 import splash from '../@styles/splashScreen';
@@ -91,18 +92,30 @@ function DocumentHead() {
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
+    const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
-    ctx.renderPage = () =>
-      originalRenderPage({
-        // Useful for wrapping the whole react tree
-        enhanceApp: (App) => App,
-        // Useful for wrapping in a per-page basis
-        enhanceComponent: (Component) => Component,
-      });
-    const initialProps = await Document.getInitialProps(ctx);
-    // Run the React rendering logic synchronously
-
-    return initialProps;
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          // Useful for wrapping the whole react tree
+          enhanceApp: (App) => (props) => sheet.collectStyles(<App {...props} />),
+          // Useful for wrapping in a per-page basis
+          enhanceComponent: (Component) => Component,
+        });
+      const initialProps = await Document.getInitialProps(ctx);
+      // Run the React rendering logic synchronously
+      return {
+        ...initialProps,
+        styles: (
+          <>
+            {initialProps.styles}
+            {sheet.getStyleElement()}
+          </>
+        ),
+      };
+    } finally {
+      sheet.seal();
+    }
   }
 
   render() {
@@ -113,10 +126,7 @@ export default class MyDocument extends Document {
           <Main />
           <NextScript />
           <div id="globalLoader">
-            <div className="loader">
-              <div />
-              <div />
-            </div>
+            <div className="loader" />
           </div>
         </body>
       </Html>

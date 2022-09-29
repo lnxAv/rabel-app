@@ -17,7 +17,7 @@ import globalVariants from '../@styles/motion.variants';
 import { XPage } from './x-page';
 
 type XAppProps = AppProps & {
-  Component: NextComponentType & XPage // add auth type
+  Component: NextComponentType & XPage; // add auth type
 };
 
 function MyApp({ Component, pageProps }: XAppProps) {
@@ -48,9 +48,7 @@ function MyApp({ Component, pageProps }: XAppProps) {
       {!Component.R3f ? ( // if doesn't contain r3f, render HTML only
         <htmlMotion.div
           key={router.pathname}
-          {...(Component.htmlMotion
-            ? { ...Component.htmlMotion }
-            : { ...globalVariants.default })}
+          {...(Component.htmlMotion ? { ...Component.htmlMotion } : { ...globalVariants.default })}
         >
           <Component {...pageProps} />
         </htmlMotion.div>
