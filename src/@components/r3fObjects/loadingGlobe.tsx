@@ -4,8 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import { MeshReffered } from '../../@helpers/types';
 
 import GlobeEffectHtml from '../htmlObjects/globeEffectHtml';
-import { PoolableComponent, PoolItemCreationProps, useObjectPool } from './pool';
-import { usePoolStore } from './poolStore';
+import { PoolableComponent, PoolItemCreationProps, useObjectPool } from '../x/extension/pool/pool';
+import { usePoolStore } from '../../@helpers/poolStore';
 
 type Props = {
   phiLength: number;
@@ -35,6 +35,10 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
     <mesh ref={mesh}>
       <Html key={context.key} occlude>
         <GlobeEffectHtml title="> loading" />
+        <button type="button" onClick={() => items.current?.context.delete()}>
+          {' '}
+          delete{' '}
+        </button>
       </Html>
     </mesh>
   );

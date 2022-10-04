@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-import { usePoolStore } from './poolStore';
+import { usePoolStore } from '../../../../@helpers/poolStore';
 
 type ItemKey = string;
 type ItemContext = {
@@ -31,6 +31,7 @@ type PoolItem = {
 };
 type PoolItemReserve = Record<ItemKey, PoolItem>;
 type ActiveItemRecord = Record<ItemKey, boolean>;
+type ReservedItemRecord = Record<ItemKey, ItemKey>;
 type GetActiveReturnType<Amount> = Amount extends undefined ? PoolItem : Array<PoolItem> | null;
 
 export type PoolItemCreationProps = { context: ItemContext };
@@ -49,7 +50,7 @@ export const useObjectPool = <P,>(
   const [isStarting, setIsStarting] = useState<boolean>(true);
   const poolId = useRef(Math.random().toString(36).slice(2, 7).toUpperCase());
   const poolItems = useRef<PoolItemReserve>({});
-  const reservedItemKey = useRef<Array<ItemKey>>([]);
+  const reservedItemKey = useRef<ReservedItemRecord>({});
   const activeItemRecord = useRef<ActiveItemRecord>({});
   const numberReserved = useRef<number>(0);
   const numberActive = useRef<number>(0);
@@ -66,12 +67,24 @@ export const useObjectPool = <P,>(
     return `${poolId.current}_${Math.random()}_${new Date().getTime()}`;
   }
 
+  function reservedItemPush(itemKey: ItemKey) {
+    if (!reservedItemKey.current[itemKey]) {
+      reservedItemKey.current[itemKey] = itemKey;
+    }
+  }
+  function reservedItemShift(): ItemKey | undefined {
+    const itemKey = Object.keys(reservedItemKey.current)?.[0] || undefined;
+    if (itemKey) {
+      delete reservedItemKey.current[itemKey];
+    }
+    return itemKey;
+  }
   const recycleItem = useCallback((itemKey: string) => {
     if (activeItemRecord.current?.[itemKey]) {
       numberReserved.current += 1;
       numberActive.current -= 1;
       delete activeItemRecord.current[itemKey];
-      reservedItemKey.current.push(itemKey);
+      reservedItemPush(itemKey);
     }
   }, []);
 
@@ -79,6 +92,7 @@ export const useObjectPool = <P,>(
     if (activeItemRecord.current?.[itemKey]) {
       numberActive.current -= 1;
       delete activeItemRecord.current[itemKey];
+      delete poolItems.current[itemKey];
       action.deleteFromStore([itemKey]);
     }
   }, []);
@@ -119,7 +133,7 @@ export const useObjectPool = <P,>(
     for (let i = 0; i < newReserveAmount; i++) {
       const newReserveKey = generateItemKey();
       poolItems.current[newReserveKey] = createPoolItem(newReserveKey);
-      reservedItemKey.current.push(newReserveKey);
+      reservedItemPush(newReserveKey);
       activeItemRecord.current[newReserveKey] = false;
     }
 
@@ -145,7 +159,7 @@ export const useObjectPool = <P,>(
       return null;
     } else if (amount === undefined) {
       // if is undefined
-      const reservedKey = reservedItemKey.current.shift();
+      const reservedKey = reservedItemShift();
       if (reservedKey) {
         numberReserved.current -= 1;
         numberActive.current += 1;
@@ -166,7 +180,7 @@ export const useObjectPool = <P,>(
       // more then 1 amount
       const oa: Array<PoolItem> = [];
       for (let i = 0; i < amount; i++) {
-        const reservedKey = reservedItemKey.current.shift();
+        const reservedKey = reservedItemShift();
         if (reservedKey) {
           numberReserved.current -= 1;
           numberActive.current += 1;
