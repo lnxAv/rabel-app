@@ -32,13 +32,9 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
   });
 
   return (
-    <mesh ref={mesh}>
-      <Html key={context.key} occlude>
+    <mesh key={context.key} ref={mesh}>
+      <Html occlude>
         <GlobeEffectHtml title="> loading" />
-        <button type="button" onClick={() => items.current?.context.delete()}>
-          {' '}
-          delete{' '}
-        </button>
       </Html>
     </mesh>
   );
