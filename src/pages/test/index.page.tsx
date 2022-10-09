@@ -61,6 +61,11 @@ const AboutMe = styled.div`
   }
 `;
 
+const CenteredText = styled.div`
+  text-align: center;
+  margin: auto;
+`;
+
 const Traits = styled.div`
   display: flex;
   flex-direction: column;
@@ -167,6 +172,14 @@ const Test: XPage = ({ title }: any) => {
         </div>
       </Block>
       <Block style={{ top: '325vh' }}>
+        <CenteredText
+          style={{
+            position: 'relative',
+            top: '-50px',
+          }}
+        >
+          [XXX xxx XXX xxx XXX]
+        </CenteredText>
         <div
           style={{
             content: ' ',
@@ -180,6 +193,13 @@ const Test: XPage = ({ title }: any) => {
             borderBottom: '5px solid white',
           }}
         />
+        <CenteredText style={{ fontSize: '50px' }}>XXXXXXXXXX</CenteredText>
+        <CenteredText style={{ fontSize: '25px' }}>@XXX XXXX %XXX</CenteredText>
+        <CenteredText style={{ fontSize: '14px', maxWidth: '550px' }}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent semper nisl elit, in
+          aliquet mi rutrum nec. Donec orci ipsum, faucibus sed maximus in, ultrices vel felis.{' '}
+        </CenteredText>
+        <CenteredText style={{ fontSize: '9px' }}>XXXX™</CenteredText>
       </Block>
     </>
   );
