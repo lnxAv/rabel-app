@@ -21,14 +21,14 @@ const openingAnimationHead = keyframes`
 `;
 
 const breathingText = keyframes`
- 0% { opacity: 0.1;}
+ 0% { opacity: 0.2;}
  50% { opacity: 0.8;}
- 100% {opacity: 0.1;}
+ 100% {opacity: 0.2;}
 `;
 const breathingTextRotate = keyframes`
- 0% { opacity: 0.1;transform: rotate(0deg);}
+ 0% { opacity: 0.2;transform: rotate(0deg);}
  50% { opacity: 0.8;}
- 100% {opacity: 0.1; transform: rotate(180deg)}
+ 100% {opacity: 0.2; transform: rotate(180deg)}
 `;
 
 const BodyBox = styled.div`
@@ -59,7 +59,7 @@ const BodyBox = styled.div`
   }
 `;
 
-const WritingBox = styled.div`
+export const WritingBox = styled.div`
   max-height: 75px;
   display: flex;
   flex-direction: column-reverse;
@@ -72,7 +72,7 @@ const WritingBox = styled.div`
   }
 `;
 
-const BreathingBox = styled.div`
+export const BreathingBox = styled.div`
   display: inline-block;
   padding: 0;
   height: auto;
@@ -87,7 +87,18 @@ const BreathingBox = styled.div`
   }
 `;
 
-const ShapeBox = styled.div`
+export const ShapeBox = styled.div`
+  div.pill {
+    border-radius: 1000px;
+    border: 1px solid red;
+    padding: 2px 15px;
+    content: ' ';
+  }
+  div.line {
+    width: auto;
+    height: auto;
+    content: ' ';
+  }
   div.circle {
     border-radius: 35px;
     border: 1px solid red;
@@ -158,6 +169,33 @@ export const TypePlus = ({ size, rotate }: { size: number; rotate?: boolean }) =
 export const TypeDots = ({ size }: { size: number }) => (
   <ShapeBox>
     <div className="circle" style={{ width: `${size}px`, height: `${size}px` }} />
+  </ShapeBox>
+);
+
+export const TypePill = ({ children, rotate }: { children?: any; rotate?: number }) => (
+  <ShapeBox>
+    <div className="pill" style={{ transform: `rotate(${rotate}deg)` }}>
+      {children}
+    </div>
+  </ShapeBox>
+);
+
+export const TypeLine = ({
+  size,
+  length,
+  opacity,
+  color,
+}: {
+  size: number;
+  length: number;
+  opacity: number;
+  color: string;
+}) => (
+  <ShapeBox>
+    <div
+      className="line"
+      style={{ borderTop: `${size}px solid ${color}`, width: `${length}px`, opacity: `${opacity}` }}
+    />
   </ShapeBox>
 );
 

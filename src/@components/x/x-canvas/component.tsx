@@ -1,4 +1,4 @@
-import { Preload } from '@react-three/drei';
+import { Preload, ScrollControls } from '@react-three/drei';
 import { Canvas, Props as CanvasProps } from '@react-three/fiber';
 import { uniqueId } from 'lodash';
 import dynamic from 'next/dynamic';
@@ -39,7 +39,18 @@ export const XCanvas: React.FC<XCanvasProps & CanvasProps> = ({
     // TODO : pass canvas ref instead ??
     setSelectedCanvas(canvasId !== selectedCanvas ? canvasId : '');
   };
-  const memoScroll = useMemo(() => (html ? <DynamicScrollableHtml {...html} /> : null), [html]);
+
+  const memoR3f = useMemo(() => (children ? <group>{children}</group> : null), [children]);
+  // If scrollableR3F Dusplay in ScrollControls else display outside
+  const memoScrollHtml = useMemo(
+    () =>
+      html ? (
+        <DynamicScrollableHtml {...html}>
+          {html?.scrollControls?.scrollR3f ? <group>{memoR3f}</group> : null}
+        </DynamicScrollableHtml>
+      ) : null,
+    [html, ScrollControls]
+  );
 
   return (
     <XCanvasWrapper style={fullscreen ? fullScreenStyle : style} devMode={app.devMode}>
@@ -51,8 +62,8 @@ export const XCanvas: React.FC<XCanvasProps & CanvasProps> = ({
         <Suspense>
           {color ? <color attach="background" args={[color]} /> : null}
           {app.devMode ? <XPerf id={canvasId} /> : null}
-          <group>{children}</group>
-          {memoScroll}
+          {html?.scrollControls?.scrollR3f ? null : <group>{children}</group>}
+          {memoScrollHtml}
         </Suspense>
       </Canvas>
     </XCanvasWrapper>

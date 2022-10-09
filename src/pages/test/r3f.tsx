@@ -29,9 +29,4 @@ const R3f: XR3f<any> = () => {
   );
 };
 
-R3f.scrollControls = {
-  pages: 2,
-  damping: 10,
-};
-
 export default R3f;

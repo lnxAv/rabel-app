@@ -45,18 +45,18 @@ function MyApp({ Component, pageProps }: XAppProps) {
         <title>{pageProps.title || manifest.name}</title>
       </Head>
       <XGUI />
-      {!Component.R3f ? ( // if doesn't contain r3f, render HTML only
+      {!Component.withR3f ? ( // if doesn't contain r3f, render HTML only
         <htmlMotion.div
           key={router.pathname}
           {...(Component.htmlMotion ? { ...Component.htmlMotion } : { ...globalVariants.default })}
         >
           <Component {...pageProps} />
         </htmlMotion.div>
-      ) : Component.R3f ? ( // if contain r3f, render canvas with injected HTML & R3F
+      ) : Component.withR3f ? ( // if contain r3f, render canvas with injected HTML & R3F
         <DynamicXCanvas
           fullscreen
           html={{
-            content: (
+            htmlContent: (
               <htmlMotion.div
                 key={router.pathname}
                 {...(Component.htmlMotion
@@ -66,17 +66,18 @@ function MyApp({ Component, pageProps }: XAppProps) {
                 <Component {...pageProps} />
               </htmlMotion.div>
             ),
-            scrollControls: Component?.R3f?.scrollControls,
+            scrollControls: Component?.withR3f?.scrollControls,
           }}
         >
           <AnimatePresence exitBeforeEnter>
             <r3fMotion.group
               key={router.pathname}
-              {...(Component.R3f.motion
-                ? { ...Component.R3f.motion }
+              {...(Component.withR3f.motion
+                ? { ...Component.withR3f.motion }
                 : { ...globalVariants.defaultScene })}
             >
-              <Component.R3f {...pageProps} />
+              {/* eslint-disable-next-line react/jsx-pascal-case */}
+              <Component.withR3f {...pageProps} />
             </r3fMotion.group>
           </AnimatePresence>
         </DynamicXCanvas>

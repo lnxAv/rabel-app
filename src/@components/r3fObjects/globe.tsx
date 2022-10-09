@@ -61,7 +61,7 @@ const Globe = () => {
     verticalRef.current += 0.3 * delta;
     verticalRef.current %= 1;
     setVertical(verticalRef.current);
-    globeRef.current.rotation.y += 0.2 * delta;
+    globeRef.current.rotation.x += 0.2 * delta;
   };
 
   useFrame((time, delta) => {
@@ -97,11 +97,11 @@ const Globe = () => {
     return newWidth;
   };
   return (
-    <group>
+    <group position={[0, 0.5, 0]}>
       <mesh rotation={[0, -0.6, 0]}>
         <group ref={globeRef}>
           {/* @ts-ignore */}
-          <Sphere scale={1} position={[0, 0, 0]} args={[...Object.values(sg)]}>
+          <Sphere scale={1} args={[...Object.values(sg)]}>
             <CartesianShader u={{ hue: [255, 0, 0], sharpness: 1 }} />
           </Sphere>
           <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
@@ -111,7 +111,6 @@ const Globe = () => {
           angle={180}
           scale={1}
           rotation={[0, Math.cos(horizontalRef.current) - 0.8, -Math.PI / 2]}
-          position={[0, 0, 0]}
           color="red"
           opacity={0.6}
           dashArray={0.01}
