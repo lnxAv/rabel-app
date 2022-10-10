@@ -21,7 +21,7 @@ const Header = styled.div`
   flex-direction: row;
   height: 25px;
   margin: auto;
-  width: 95%;
+  padding: 0 15px;
   top: 25px;
   gap: 5%;
   div.extension {
@@ -32,15 +32,40 @@ const Header = styled.div`
     font-style: bold;
   }
   div.navigation {
+    position: relative;
     border: 1px solid red;
-    width: 150px;
+    width: 75px;
+    left: -1%;
   }
 `;
 
 const AboutMeWrapper = styled.div`
   position: relative;
   width: 95%;
+  padding: 0 15px;
+`;
+
+const Traits = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 5px;
   margin: auto;
+  div.section {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    div {
+      width: 100%;
+      min-width: 50px;
+      padding: 5px;
+      border: 1px solid red;
+      border-right: 0;
+    }
+    div:last-child {
+      border-right: 1px solid red;
+    }
+  }
 `;
 
 const AboutMe = styled.div`
@@ -59,33 +84,25 @@ const AboutMe = styled.div`
     top: 15px;
     left: 15px;
   }
+  @media (max-width: 700px) {
+    flex-direction: column;
+    div.about-text {
+      width: 95%;
+      max-width: none;
+    }
+    ${Traits} {
+      width: 95%;
+      padding-top: 50px;
+    }
+  }
 `;
 
 const CenteredText = styled.div`
-  text-align: center;
-  margin: auto;
-`;
-
-const Traits = styled.div`
   display: flex;
-  flex-direction: column;
-  width: auto;
-  row-gap: 5px;
-  margin-top: auto;
-  margin-bottom: auto;
-  div.section {
-    display: flex;
-    flex-direction: row;
-    div {
-      width: 100px;
-      padding: 3px;
-      border: 1px solid red;
-      border-right: 0;
-    }
-    div:last-child {
-      border-right: 1px solid red;
-    }
-  }
+  justify-content: center;
+  text-align: center;
+  width: 100vw;
+  margin: auto;
 `;
 
 const Test: XPage = ({ title }: any) => {
@@ -97,7 +114,15 @@ const Test: XPage = ({ title }: any) => {
       </Head>
       <Block>
         <Header>
-          <div className="extension">xxxxx</div>
+          <div
+            className="extension"
+            style={{
+              fontSize: '15px',
+              fontFamily: 'project-space, monospace',
+            }}
+          >
+            12:15 p.m
+          </div>
           <div className="navigation">xxx | xxx</div>
         </Header>
       </Block>
@@ -175,10 +200,11 @@ const Test: XPage = ({ title }: any) => {
         <CenteredText
           style={{
             position: 'relative',
+            fontFamily: 'project-space, monospace',
             top: '-50px',
           }}
         >
-          [XXX xxx XXX xxx XXX]
+          [ CONSOLE ]
         </CenteredText>
         <div
           style={{
@@ -189,17 +215,42 @@ const Test: XPage = ({ title }: any) => {
             height: '25vw',
             maxWidth: '75px',
             maxHeight: '75px',
-            borderLeft: '5px solid white',
-            borderBottom: '5px solid white',
+            borderLeft: '4px solid white',
+            borderBottom: '4px solid white',
           }}
         />
-        <CenteredText style={{ fontSize: '50px' }}>XXXXXXXXXX</CenteredText>
-        <CenteredText style={{ fontSize: '25px' }}>@XXX XXXX %XXX</CenteredText>
-        <CenteredText style={{ fontSize: '14px', maxWidth: '550px' }}>
+        <CenteredText
+          style={{
+            fontSize: '50px',
+            fontFamily: 'project-space, monospace',
+          }}
+        >
+          <p
+            style={{
+              transform: 'scale(1, 1)',
+              letterSpacing: '1px',
+            }}
+          >
+            CONTACT
+          </p>
+        </CenteredText>
+        <CenteredText
+          style={{
+            fontSize: '25px',
+            maxWidth: '550px',
+            fontFamily: 'disket-mono-bold, monospace',
+            letterSpacing: '6px',
+          }}
+        >
+          @Email $LinkdIn #Git
+        </CenteredText>
+        <CenteredText
+          style={{ fontSize: '14px', maxWidth: '550px', fontFamily: 'dot16, monospace' }}
+        >
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent semper nisl elit, in
           aliquet mi rutrum nec. Donec orci ipsum, faucibus sed maximus in, ultrices vel felis.{' '}
         </CenteredText>
-        <CenteredText style={{ fontSize: '9px' }}>XXXX™</CenteredText>
+        <CenteredText style={{ fontSize: '12px' }}>XXXX™</CenteredText>
       </Block>
     </>
   );
@@ -215,7 +266,8 @@ export async function getStaticProps({ locale }: any) {
 
 R3f.scrollControls = {
   pages: 4,
-  damping: 10,
+  damping: 5,
+  distance: 3,
   scrollR3f: true,
 };
 

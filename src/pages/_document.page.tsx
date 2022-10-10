@@ -73,7 +73,49 @@ function DocumentHead() {
       <meta property="og:site_name" content={titleDefault} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content="https://yourdomain.com/icons/apple-touch-icon.png" />
-
+      {/* Fonts */}
+      <link
+        rel="preload"
+        href="/fonts/dotgothic16-regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/fonts/dotgothic16-regular.woff"
+        as="font"
+        type="font/woff"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/fonts/project_space.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="/fonts/project_space.woff"
+        as="font"
+        type="font/woff"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="fonts/genesys.woff2"
+        as="font"
+        type="font/woff2"
+        crossOrigin="anonymous"
+      />
+      <link
+        rel="preload"
+        href="fonts/genesys.woff"
+        as="font"
+        type="font/woff"
+        crossOrigin="anonymous"
+      />
       {/* apple splash screen images */}
       {/*
         <link rel='apple-touch-startup-image' href='/images/apple_splash_2048.png' sizes='2048x2732' />

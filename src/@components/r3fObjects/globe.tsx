@@ -18,7 +18,7 @@ const sg = {
   thetaLength: Math.PI,
 };
 
-const Globe = () => {
+const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
   const globeRef = useRef<GroupReffered>(null);
   const [vertical, setVertical] = useState<number>(0);
   const verticalRef = useRef<number>(0);
@@ -34,8 +34,11 @@ const Globe = () => {
     const newVertical = 1 - e.y / size.height;
     const newHorizontal = 1 - e.x / size.width;
     setVertical(newVertical);
-    globeRef.current.rotation.y = newHorizontal;
-    globeRef.current.rotation.x = newVertical;
+    if (globeRef?.current) {
+      globeRef.current.rotation.y = newHorizontal;
+      globeRef.current.rotation.x = newVertical;
+    }
+
     horizontalRef.current = newHorizontal;
   };
 
@@ -96,8 +99,9 @@ const Globe = () => {
     const newWidth = width * Math.cos(distancePercentage);
     return newWidth;
   };
+
   return (
-    <group position={[0, 0.5, 0]}>
+    <group position={[0, 0.5, 0]} ref={ref} userData={{ defaultPosition: [0, 0.5, 0] }}>
       <mesh rotation={[0, -0.6, 0]}>
         <group ref={globeRef}>
           {/* @ts-ignore */}
@@ -128,6 +132,6 @@ const Globe = () => {
       </mesh>
     </group>
   );
-};
+});
 
 export default Globe;

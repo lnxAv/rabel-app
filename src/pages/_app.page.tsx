@@ -1,4 +1,5 @@
 import '../@styles/globals.css';
+import '../@styles/fonts.css';
 
 import { AnimatePresence, motion as htmlMotion } from 'framer-motion';
 import { motion as r3fMotion } from 'framer-motion-3d';
