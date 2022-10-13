@@ -22,7 +22,7 @@ precision mediump float;
 
       void main () {
             float g = gridFactor( vec3( cartesianX > 0.0 ? p.x * cartesianX : 0.5, cartesianY > 0.0 ? p.y * cartesianY : 0.5, cartesianZ > 0.0 ? p.z * cartesianZ : 0.5 ), width, sharpness);
-            vec4 color = vec4(hue, g);
-            vec4 mixed = mix(color, vec4(color.xyz, 0.0), g);
+            vec4 color = vec4(hue.x / 255.0, hue.y /255.0, hue.z /255.0, opacityA);
+            vec4 mixed = mix(color, vec4(color.xyz /2.0, 0.0), g);
             gl_FragColor =  mixed;
       }

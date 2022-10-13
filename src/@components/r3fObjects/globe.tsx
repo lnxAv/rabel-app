@@ -1,15 +1,17 @@
-import { Sphere } from '@react-three/drei';
+import { Html, Sphere } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useRef, useState } from 'react';
-import { GroupReffered } from '../../@helpers/types';
 
+import { GroupReffered } from '../../@helpers/types';
 import CartesianShader from '../../@styles/shader/cartesian/component';
+import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
+import { RhombicDodecaedronLines } from '../x/x-shapes/rhombic_dodecahedron';
 import AnimatedLine from './animatedLine';
 import LoadingGlobe from './loadingGlobe';
 
 /* eslint-enable no-unused-vars */
 const sg = {
-  radius: 1,
+  radius: 0.9,
   widthSegment: 32,
   heightSegment: 15,
   phiStart: 0,
@@ -101,14 +103,33 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
   };
 
   return (
-    <group position={[0, 0.5, 0]} ref={ref} userData={{ defaultPosition: [0, 0.5, 0] }}>
+    <group position={[0, 0.5, 0]} ref={ref} userData={{ defaultPosition: [0, 0.5, 0] }} scale={1.4}>
       <mesh rotation={[0, -0.6, 0]}>
         <group ref={globeRef}>
           {/* @ts-ignore */}
           <Sphere scale={1} args={[...Object.values(sg)]}>
-            <CartesianShader u={{ hue: [255, 0, 0], sharpness: 1 }} />
+            <CartesianShader u={{ hue: [255, 0, 41], sharpness: 0.5, opacityA: 1.5 }} />
           </Sphere>
+          <RhombicDodecaedronLines color="rgba(255, 0, 41, 0)" scale={0.45} opacity={0} />
           <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
+          <Html>
+            <BreathingBox
+              style={{
+                transform: 'rotate(90deg) translate(-20px, 0)',
+                pointerEvents: 'none',
+                fontFamily: 'disket-mono-bold, monospace',
+              }}
+            >
+              <CircleText
+                text={props.globeText}
+                arc={180}
+                radius="250px"
+                offset={-260}
+                fontSize={50}
+                color="red"
+              />
+            </BreathingBox>
+          </Html>
         </group>
         <AnimatedLine
           amplitude={1.3}
@@ -116,7 +137,7 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
           scale={1}
           rotation={[0, Math.cos(horizontalRef.current) - 0.8, -Math.PI / 2]}
           color="red"
-          opacity={0.6}
+          opacity={0.8}
           dashArray={0.01}
           dashRatio={0.5}
           widthCallback={(p: number) =>

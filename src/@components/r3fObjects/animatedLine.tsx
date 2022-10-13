@@ -5,7 +5,6 @@ import { Vector3 } from 'three';
 
 extend({ MeshLine, MeshLineMaterial });
 
-/* eslint-disable no-unused-vars */
 declare global {
   namespace JSX {
     interface IntrinsicElements {

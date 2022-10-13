@@ -56,12 +56,12 @@ const CartesianShader = memo(
     );
     useEffect(() => {
       if (meshRef?.current) {
-        meshRef.current.uniforms.cartesianX.value = u?.cartesianX || 2;
-        meshRef.current.uniforms.cartesianY.value = u?.cartesianY || 2;
-        meshRef.current.uniforms.cartesianZ.value = u?.cartesianZ || 2;
-        meshRef.current.uniforms.width.value = u?.width || 1;
-        meshRef.current.uniforms.sharpness.value = u?.sharpness || 8;
-        meshRef.current.uniforms.opacityA.value = u?.opacityA || 1;
+        meshRef.current.uniforms.cartesianX.value = u?.cartesianX !== undefined ? u.cartesianX : 2;
+        meshRef.current.uniforms.cartesianY.value = u?.cartesianY !== undefined ? u.cartesianY : 2;
+        meshRef.current.uniforms.cartesianZ.value = u?.cartesianZ !== undefined ? u.cartesianZ : 2;
+        meshRef.current.uniforms.width.value = u?.width !== undefined ? u.width : 1;
+        meshRef.current.uniforms.sharpness.value = u?.sharpness !== undefined ? u.sharpness : 1000;
+        meshRef.current.uniforms.opacityA.value = u?.opacityA !== undefined ? u.opacityA : 1;
         const newHue = hue;
         newHue.set(u?.hue?.[0] || 0, u?.hue?.[1] || 0, u?.hue?.[2] || 0);
         setHue(newHue);

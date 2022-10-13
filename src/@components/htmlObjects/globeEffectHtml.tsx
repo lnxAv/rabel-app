@@ -233,6 +233,54 @@ export const TypeSquareDots = ({ size }: { size: number }) => (
   </ShapeBox>
 );
 
+export const CircleText = ({
+  text,
+  arc = 120,
+  radius = 50,
+  offset = 0,
+  fontSize = 15,
+  color = 'white',
+}: {
+  text: string;
+  arc?: number;
+  radius?: number | string;
+  offset?: number | string;
+  fontSize?: number | string;
+  color?: string;
+}) => {
+  const [characters, setCharacters] = useState(text?.split('') || []);
+  const [degree, setDegree] = useState(arc / characters.length);
+  const [fixedRadius] = useState(typeof radius === 'number' ? `${radius}px` : radius);
+
+  useEffect(() => {
+    const newTextSplit = text?.split('') || [];
+    setCharacters(newTextSplit);
+    setDegree(arc / newTextSplit.length);
+  }, [text]);
+
+  return (
+    <p>
+      {characters.map((char, i) => (
+        <span
+          key={`heading-span-${i}`}
+          style={{
+            position: 'absolute',
+            height: fixedRadius,
+            width: fixedRadius,
+            top: offset,
+            fontSize: fontSize || '',
+            color: color || '',
+            transform: `rotate(${degree * i - arc / 2}deg)`,
+            transformOrigin: `0 ${fixedRadius} 0`,
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </p>
+  );
+};
+
 const GlobeEffectHtml = ({ ...props }: Props) => {
   useEffect(() => {}, []);
   function randomNumber(min: number, max: number) {

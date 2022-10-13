@@ -33,7 +33,7 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
 
   return (
     <mesh key={context.key} ref={mesh}>
-      <Html occlude>
+      <Html occlude style={{ pointerEvents: 'none' }}>
         <GlobeEffectHtml title="> loading" />
       </Html>
     </mesh>

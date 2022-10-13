@@ -1,6 +1,7 @@
 import { Line } from '@react-three/drei';
 import { MeshProps } from '@react-three/fiber';
-import React, { forwardRef, Ref } from 'react';
+import React, { forwardRef } from 'react';
+
 import { GroupReffered, MeshReffered } from '../../../@helpers/types';
 
 export const args: PolyhedronArgs = {
@@ -22,13 +23,11 @@ export const args: PolyhedronArgs = {
   ],
   indices: [
     // Top
-    12, 2, 0, 8, 0, 2, 12, 6, 2, 11, 2, 6, 12, 4, 6, 9, 6, 4, 12, 0, 4, 10, 4,
-    0,
+    12, 2, 0, 8, 0, 2, 12, 6, 2, 11, 2, 6, 12, 4, 6, 9, 6, 4, 12, 0, 4, 10, 4, 0,
     // Sides
     11, 3, 2, 8, 2, 3, 8, 1, 0, 10, 0, 1, 10, 5, 4, 9, 4, 5, 9, 7, 6, 11, 6, 7,
     // Bottom
-    13, 3, 7, 11, 7, 3, 13, 1, 3, 8, 3, 1, 13, 5, 1, 10, 1, 5, 13, 7, 5, 9, 5,
-    7,
+    13, 3, 7, 11, 7, 3, 13, 1, 3, 8, 3, 1, 13, 5, 1, 10, 1, 5, 13, 7, 5, 9, 5, 7,
   ],
   indicesLines: [
     // Line 1
@@ -44,26 +43,17 @@ export const args: PolyhedronArgs = {
   detail: 0,
 };
 
-export const RhombicDodecaedron = forwardRef(
-  (
-    {
-      radius = args.radius,
-      detail = args.detail,
-      ...props
-    }: MeshProps & PolyhedronType,
-    ref: Ref<MeshReffered>,
-  ) => (
+export const RhombicDodecaedron = forwardRef<MeshReffered, MeshProps & PolyhedronType>(
+  ({ radius = args.radius, detail = args.detail, ...props }, ref) => (
     <mesh ref={ref} {...props}>
-      <polyhedronBufferGeometry
-        args={[args.vertices.flat(), args.indices, radius, detail]}
-      />
+      <polyhedronBufferGeometry args={[args.vertices.flat(), args.indices, radius, detail]} />
       {props.children}
     </mesh>
-  ),
+  )
 );
 
-export const RhombicDodecaedronLines = forwardRef(
-  ({ children, ...props }: LineType, ref: Ref<GroupReffered>) => (
+export const RhombicDodecaedronLines = forwardRef<GroupReffered, LineType>(
+  ({ children, ...props }, ref) => (
     <group ref={ref}>
       {args.indicesLines?.map((value, index) => {
         const points = value.map((indice) => args.vertices[indice]);
@@ -71,5 +61,5 @@ export const RhombicDodecaedronLines = forwardRef(
       })}
       {children}
     </group>
-  ),
+  )
 );
