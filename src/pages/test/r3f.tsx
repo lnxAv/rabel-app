@@ -153,7 +153,7 @@ const R3f: XR3f<any> = () => {
       defaultBoxTimeout.current = setTimeout(() => {
         setDefaultBox(textBoundsRef.current[v]);
         setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
-      }, 350);
+      }, 500);
     }
     setHovered(null);
     fromVecRef.current = textArrayRef.current[index].position;

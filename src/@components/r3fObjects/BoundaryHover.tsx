@@ -14,10 +14,10 @@ type Props = {
 // Order:
 // top-left: 0 - top-right: 1 - bottom right: 2 - bottom left: 3
 const defaultBoundary = [
-  { x: -0.1, y: 0.1 },
-  { x: 0.1, y: 0.1 },
-  { x: 0.1, y: 0 },
-  { x: -0.1, y: 0 },
+  { x: -0.2, y: 0.2 },
+  { x: 0.2, y: 0.2 },
+  { x: 0.2, y: 0 },
+  { x: -0.2, y: 0 },
 ];
 
 const basicVector = new Vector3(0);
