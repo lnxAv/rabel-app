@@ -112,25 +112,25 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
           </Sphere>
           <RhombicDodecaedronLines color="rgba(255, 0, 41, 0)" scale={0.45} opacity={0} />
           <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
-          <Html>
-            <BreathingBox
-              style={{
-                transform: 'rotate(90deg) translate(-20px, 0)',
-                pointerEvents: 'none',
-                fontFamily: 'disket-mono-bold, monospace',
-              }}
-            >
-              <CircleText
-                text={props.globeText}
-                arc={180}
-                radius="250px"
-                offset={-260}
-                fontSize={50}
-                color="red"
-              />
-            </BreathingBox>
-          </Html>
         </group>
+        <Html transform scale={[0.2, 0.2, 0.2]} position={[0, 0, 0]} rotation={[0, 0, 0]}>
+          <BreathingBox
+            style={{
+              transform: 'rotate(90deg) translate(-20px, 0)',
+              pointerEvents: 'none',
+              fontFamily: 'disket-mono-bold, monospace',
+            }}
+          >
+            <CircleText
+              text={props.globeText}
+              arc={180}
+              radius="250px"
+              offset={-260}
+              fontSize={50}
+              color="red"
+            />
+          </BreathingBox>
+        </Html>
         <AnimatedLine
           amplitude={1.3}
           angle={180}

@@ -1,9 +1,10 @@
 import { OrthographicCamera, Text, useScroll } from '@react-three/drei';
-import { extend, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
+import { extend, ReactThreeFiber, ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useRef, useState } from 'react';
-import { MathUtils } from 'three';
+import { Box3, MathUtils, Vector3 } from 'three';
 
+import { BoundaryHover } from '../../@components/r3fObjects/BoundaryHover';
 import Globe from '../../@components/r3fObjects/globe';
 import { GroupReffered, MeshReffered } from '../../@helpers/types';
 import { XR3f } from '../x-page';
@@ -31,14 +32,24 @@ const fontProps = {
 
 const SelectionArray = ['ABOUT', 'TOOLS', 'PRJCT', 'REACH'];
 
+type TextBounds = {
+  [k in string]: Box3;
+};
+
 const R3f: XR3f<any> = () => {
   const globeGroupRef = useRef<GroupReffered>(null);
   const textGroupRef = useRef<GroupReffered>(null);
   const textArrayRef = useRef<Array<MeshReffered>>([]);
+  const textBoundsRef = useRef<TextBounds>({});
+  const [defaultBox, setDefaultBox] = useState<Box3 | undefined>(undefined);
+  const [defaultX, setDefaultX] = useState<Vector3 | undefined>(undefined);
+  const defaultBoxTimeout = useRef<number | undefined | ReturnType<typeof setTimeout>>(undefined);
+  const toVecRef = useRef<Vector3>(new Vector3(0));
+  const fromVecRef = useRef<Vector3>(new Vector3(0));
   const data = useScroll();
-  const [selected, setSelected] = useState<string>(SelectionArray[0]);
+  const selected = useRef<string>('');
   const [hovered, setHovered] = useState<string | null>(null);
-  const { width, height } = useThree((s) => s.viewport);
+  const [{ width, height }] = useThree((s) => [s.viewport, s.mouse]);
 
   const doGlobeFrame = (a: number, delta: number) => {
     if (!globeGroupRef.current) return;
@@ -87,7 +98,7 @@ const R3f: XR3f<any> = () => {
     } else {
       textArrayRef.current.forEach((textRef, i) => {
         const isReady = textRef.position.y > 0.9 * -i;
-        const isSelected = selected === textRef.userData.selection;
+        const isSelected = selected.current === textRef.userData.selection;
         if (
           a2 < 0.99 ||
           (!isSelected && !isReady) ||
@@ -122,6 +133,40 @@ const R3f: XR3f<any> = () => {
     doTextFrame(a1, a2, stickyOffset, delta);
   });
 
+  const handleOnHovered = (e: ThreeEvent<PointerEvent>, v: string, index: number) => {
+    setHovered(v);
+    if (defaultBox) {
+      setDefaultBox(undefined);
+    }
+    toVecRef.current = textArrayRef.current[index].position;
+    fromVecRef.current = textArrayRef.current[index].position;
+  };
+
+  const handleOnHoveredLeave = (e: ThreeEvent<PointerEvent>, v: string, index: number) => {
+    if (v === selected.current) {
+      selected.current = v;
+      setDefaultBox(textBoundsRef.current[v]);
+      setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
+      clearTimeout(defaultBoxTimeout.current);
+    } else {
+      clearTimeout(defaultBoxTimeout.current);
+      defaultBoxTimeout.current = setTimeout(() => {
+        setDefaultBox(textBoundsRef.current[v]);
+        setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
+      }, 350);
+    }
+    setHovered(null);
+    fromVecRef.current = textArrayRef.current[index].position;
+  };
+
+  const handleOnSelected = (e: ThreeEvent<MouseEvent>, v: string, index: number) => {
+    clearTimeout(defaultBoxTimeout.current);
+    selected.current = v;
+    setDefaultBox(textBoundsRef.current[v]);
+    setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
+    fromVecRef.current = textArrayRef.current[index].position;
+  };
+
   return (
     <>
       <OrthographicCamera />
@@ -129,7 +174,7 @@ const R3f: XR3f<any> = () => {
       <group
         ref={textGroupRef}
         position={[width * 2, -height + 3, -1]}
-        scale={[Math.min(height / 2.5, width / 2.5), height / 5, 1]}
+        scale={[Math.min(height / 3, width / 3), height / 5, 1]}
       >
         {SelectionArray.map((v, i) => (
           <Text
@@ -138,16 +183,34 @@ const R3f: XR3f<any> = () => {
             userData={{ selection: v }}
             position={[0, -i, 0]}
             renderOrder={-5}
-            onClick={() => setSelected(v)}
-            onPointerEnter={() => setHovered(v)}
-            onPointerLeave={() => setHovered(null)}
+            onPointerUp={(e) => handleOnSelected(e, v, i)}
+            onPointerEnter={(e) => handleOnHovered(e, v, i)}
+            onPointerDown={(e) => handleOnHovered(e, v, i)}
+            onPointerLeave={(e) => handleOnHoveredLeave(e, v, i)}
+            onSync={(mesh) => {
+              const blockBounds = { ...mesh.textRenderInfo.visibleBounds };
+              textBoundsRef.current[v] = new Box3(
+                new Vector3(blockBounds[0], blockBounds[1], 0),
+                new Vector3(blockBounds[2], blockBounds[3], 0)
+              );
+              if (i === 0) {
+                selected.current = v;
+                setDefaultBox(textBoundsRef.current[v]);
+                setDefaultX(mesh.position);
+              }
+            }}
             {...fontProps}
-            fillOpacity={selected === v ? 1 : hovered === v ? 0.5 : 0}
-            strokeOpacity={selected === v ? 1 : hovered === v ? 0.5 : 1}
+            fillOpacity={selected.current === v ? 1 : hovered === v ? 0.5 : 0}
+            strokeOpacity={selected.current === v ? 1 : hovered === v ? 0.5 : 1}
           >
             {v}
           </Text>
         ))}
+        <BoundaryHover
+          box={hovered ? textBoundsRef.current[hovered] : defaultBox}
+          to={hovered ? toVecRef.current : defaultX}
+          from={!hovered ? fromVecRef.current : undefined}
+        />
       </group>
     </>
   );
