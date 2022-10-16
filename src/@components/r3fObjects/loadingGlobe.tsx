@@ -47,25 +47,11 @@ const LoadingGlobe = ({ phiLength, thetaLength }: Props) => {
       theta: Math.random() * phiLength,
     }),
     reserve: 5,
-    activeAtStart: 25,
+    activeAtStart: 50,
     limit: 50,
   });
 
-  return (
-    <group renderOrder={-1}>
-      {pool.activeMap((poolItem) => poolItem.object)}
-      <Html>
-        <button
-          type="button"
-          onClick={() => {
-            pool.getObject(2);
-          }}
-        >
-          ADD
-        </button>
-      </Html>
-    </group>
-  );
+  return <group renderOrder={-1}>{pool.activeMap((poolItem) => poolItem.object)}</group>;
 };
 
 export default LoadingGlobe;

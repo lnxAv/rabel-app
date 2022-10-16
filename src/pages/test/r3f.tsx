@@ -183,6 +183,8 @@ const R3f: XR3f<any> = () => {
             userData={{ selection: v }}
             position={[0, -i, 0]}
             renderOrder={-5}
+            anchorX="center"
+            anchorY="middle"
             onPointerUp={(e) => handleOnSelected(e, v, i)}
             onPointerEnter={(e) => handleOnHovered(e, v, i)}
             onPointerDown={(e) => handleOnHovered(e, v, i)}

@@ -148,10 +148,12 @@ export const BoundaryHover = ({ from, to, box }: Props) => {
               style={{
                 content: ' ',
                 position: 'absolute',
-                height: `${boxSize.current.y * 110}px`, // 100%
-                top: `-${boxSize.current.y * 10}px`, // 10%
+                height: `${boxSize.current.y * 15}vh`, // 100%
+                top: `-${boxSize.current.y * 3}vh`, // 10%
                 width: '10px',
-                margin: `0 ${boxSize.current.x * 2 * (i === 1 || i === 2 ? 1 : -2)}px`, // 2%
+                margin: `${boxSize.current.y / 10}px ${
+                  boxSize.current.x * 2 * (i === 1 || i === 2 ? 1 : -2)
+                }px`, // 2%
                 borderLeft: `${i === 0 || i === 3 ? '5px solid white' : 'none'}`,
                 borderRight: `${i === 1 || i === 2 ? '5px solid white' : 'none'}`,
                 borderBottom: `${i === 2 || i === 3 ? '5px solid white' : 'none'}`,
