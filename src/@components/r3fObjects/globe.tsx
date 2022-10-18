@@ -27,6 +27,7 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
   const horizontalRef = useRef<number>(0);
   const [startBlur, setStartBlur] = useState<boolean>(true);
   const windowFocus = useRef<boolean>(false);
+  // const data = useScroll();
   const { size } = useThree();
 
   const updateMouse = (e: any) => {

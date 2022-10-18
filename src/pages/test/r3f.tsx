@@ -1,5 +1,5 @@
 import { OrthographicCamera, Text, useScroll } from '@react-three/drei';
-import { extend, ReactThreeFiber, ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { extend, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useRef, useState } from 'react';
 import { Box3, MathUtils, Vector3 } from 'three';
@@ -31,15 +31,22 @@ const fontProps = {
 };
 
 const SelectionArray = ['ABOUT', 'TOOLS', 'PRJCT', 'REACH'];
+const OptionButtonArray = ['PREV', 'NEXT'];
 
 type TextBounds = {
   [k in string]: Box3;
 };
 
+type TextRef = {
+  [k in string]: MeshReffered;
+};
+
 const R3f: XR3f<any> = () => {
+  const isGlobeReady = useRef<boolean>(false);
   const globeGroupRef = useRef<GroupReffered>(null);
+  const optionGroupRef = useRef<GroupReffered>(null);
   const textGroupRef = useRef<GroupReffered>(null);
-  const textArrayRef = useRef<Array<MeshReffered>>([]);
+  const textRefs = useRef<TextRef>({});
   const textBoundsRef = useRef<TextBounds>({});
   const [defaultBox, setDefaultBox] = useState<Box3 | undefined>(undefined);
   const [defaultX, setDefaultX] = useState<Vector3 | undefined>(undefined);
@@ -64,9 +71,6 @@ const R3f: XR3f<any> = () => {
     } else {
       const a2Pos = -height * a2 + 0.6;
       const isReady = textGroupRef.current.position.y - 1.5 > globeGroupRef.current.position.y;
-      // const precGlobe = globeGroupRef.current.position.y - 0.1;
-      // const precA2Pos = a2Pos;
-      // const isReady = precGlobe <= precA2Pos && Math.floor(a2);
       if (!isReady) {
         globeGroupRef.current.position.y = MathUtils.damp(
           globeGroupRef.current.position.y,
@@ -110,13 +114,13 @@ const R3f: XR3f<any> = () => {
       );
     }
     // vertical animation
-    if (a2 < 0.001) {
-      textArrayRef.current.forEach((textRef) => {
+    SelectionArray.every((elem, i) => {
+      const textRef = textRefs.current[elem];
+      if (!textRef?.position) return false;
+      if (a2 < 0.001) {
         /* eslint-disable no-param-reassign */
         textRef.position.y = MathUtils.damp(textRef.position.y, 0, 4, delta);
-      });
-    } else {
-      textArrayRef.current.forEach((textRef, i) => {
+      } else {
         const isReady = textRef.position.y > 0.9 * -i;
         const isSelected = selected.current === textRef.userData.selection;
         if (
@@ -129,14 +133,99 @@ const R3f: XR3f<any> = () => {
           textRef.position.y = MathUtils.damp(
             textRef.position.y,
             Math.max(topOffset - textGroupRef.current.position.y + 1, -height * (data.pages - 3.3)),
-            9,
+            5,
             delta
           );
+          // Animate text Option at the end
+          /* if (optionGroupRef.current) {
+            const textOffset = (defaultBox?.max.y || 0) + (defaultBox?.min.y || 0);
+            OptionButtonArray.every((optionElem) => {
+              const optionRef = textRefs.current[optionElem];
+              if (!optionRef?.position) return false; // skip
+              if (isGlobeReady.current) {
+                optionRef.visible = true;
+                optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 1, 5, delta);
+                optionRef.rotation.x = MathUtils.damp(
+                  optionRef.rotation.x,
+                  MathUtils.radToDeg(0) * delta,
+                  5,
+                  delta
+                );
+              } else if (!isGlobeReady.current && optionRef.visible) {
+                // optionRef.visible = false;
+                optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 0, 5, delta);
+                if (optionRef.scale.x <= 0.1) {
+                  optionRef.visible = false;
+                }
+                optionRef.rotation.x = MathUtils.damp(
+                  optionRef.rotation.x,
+                  MathUtils.radToDeg(0.25),
+                  5,
+                  delta
+                );
+              } else {
+                optionRef.visible = false;
+              }
+              return true; // next
+            });
+            // Position
+            optionGroupRef.current.position.y = MathUtils.damp(
+              optionGroupRef.current.position.y,
+              textRef.position.y + textOffset - 0.4,
+              10,
+              delta
+            );
+          } */
         }
-      });
-    }
+      }
+      return true;
+    });
   };
 
+  const doTextOptionFrame = (a2: number, delta: number) => {
+    // Animate text Option at the end
+    if (optionGroupRef.current) {
+      const textOffset = (defaultBox?.max.y || 0) + (defaultBox?.min.y || 0);
+      const textRef = textRefs.current[selected.current];
+      OptionButtonArray.every((optionElem) => {
+        const optionRef = textRefs.current[optionElem];
+        if (!optionRef?.position) return false; // skip
+        if (isGlobeReady.current) {
+          optionRef.visible = true;
+          optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 1, 5, delta);
+          optionRef.rotation.x = MathUtils.damp(
+            optionRef.rotation.x,
+            MathUtils.radToDeg(0) * delta,
+            5,
+            delta
+          );
+        } else if (!isGlobeReady.current && optionRef.visible) {
+          // optionRef.visible = false;
+          optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 0, 5, delta);
+          if (optionRef.scale.x <= 0.1) {
+            optionRef.visible = false;
+          }
+          optionRef.rotation.x = MathUtils.damp(
+            optionRef.rotation.x,
+            MathUtils.radToDeg(0.25),
+            5,
+            delta
+          );
+        } else {
+          optionRef.visible = false;
+        }
+        return true; // next
+      });
+      // Position
+      if (textRef?.position)
+        optionGroupRef.current.position.y = MathUtils.damp(
+          optionGroupRef.current.position.y,
+          textRef.position.y + textOffset - 0.4,
+          10,
+          delta
+        );
+    }
+  };
   useEffect(() => {
     if (hovered) document.body.style.cursor = 'pointer';
     return () => {
@@ -148,45 +237,65 @@ const R3f: XR3f<any> = () => {
     const a1 = data.range(0.5 / 6, 0.07); // right-to-left
     const a2 = data.range(0.5 / 6 + 0.035, 1.85 / 5 - (1 / 4 + 0.035)); // move-to-bottom
     const stickyOffset = -height * ((data.pages - 1) * data.offset) + height * data.offset;
+    isGlobeReady.current = data.visible(2.4 / 4, 0.7 / 4);
     doGlobeFrame(a2, stickyOffset, delta);
     doTextFrame(a1, a2, stickyOffset, delta);
+    doTextOptionFrame(a2, delta);
   });
 
-  const handleOnHovered = (e: ThreeEvent<PointerEvent>, v: string, index: number) => {
-    setHovered(v);
+  const handleOnHovered = (hoveredElem: string, boxElem?: string) => {
+    setHovered(hoveredElem);
     if (defaultBox) {
       setDefaultBox(undefined);
     }
-    toVecRef.current = textArrayRef.current[index].position;
-    fromVecRef.current = textArrayRef.current[index].position;
+    const vecElem = boxElem || hoveredElem;
+    toVecRef.current = textRefs.current[vecElem || ''].position || null;
+    fromVecRef.current = textRefs.current[vecElem || ''].position || null;
   };
 
-  const handleOnHoveredLeave = (e: ThreeEvent<PointerEvent>, v: string, index: number) => {
-    if (v === selected.current) {
-      selected.current = v;
-      setDefaultBox(textBoundsRef.current[v]);
-      setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
+  const handleOnHoveredLeave = (hoveredElem: string) => {
+    setHovered(null);
+    if (hoveredElem === selected.current) {
+      selected.current = hoveredElem;
+      setDefaultBox(textBoundsRef.current[hoveredElem]);
+      setDefaultX(textRefs.current[selected.current || '']?.position || null);
       clearTimeout(defaultBoxTimeout.current);
     } else {
       clearTimeout(defaultBoxTimeout.current);
       defaultBoxTimeout.current = setTimeout(() => {
-        setDefaultBox(textBoundsRef.current[v]);
-        setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
+        setDefaultBox(textBoundsRef.current[hoveredElem]);
+        setDefaultX(textRefs.current[selected.current || '']?.position || null);
       }, 500);
     }
-    setHovered(null);
-    fromVecRef.current = textArrayRef.current[index].position;
+    fromVecRef.current = textRefs.current[hoveredElem || '']?.position || null;
   };
 
-  const handleOnSelected = (e: ThreeEvent<MouseEvent>, v: string, index: number) => {
+  const handleOnSelected = (elem: string) => {
     clearTimeout(defaultBoxTimeout.current);
-    selected.current = v;
+    selected.current = elem;
     setHovered(null);
-    setDefaultBox(textBoundsRef.current[v]);
-    setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
-    fromVecRef.current = textArrayRef.current[index].position;
+    setDefaultBox(textBoundsRef.current[elem]);
+    setDefaultX(textRefs.current[elem || '']?.position || null);
+    fromVecRef.current = textRefs.current[elem || '']?.position || null;
   };
 
+  const handleOnOption = (elem: string) => {
+    clearTimeout(defaultBoxTimeout.current);
+    let newSelection = SelectionArray.indexOf(selected.current);
+    if (elem === 'NEXT') {
+      newSelection++;
+      newSelection %= SelectionArray.length;
+    } else if (elem === 'PREV') {
+      newSelection = newSelection === 0 ? SelectionArray.length - 1 : newSelection - 1;
+    }
+    handleOnSelected(SelectionArray[newSelection]);
+  };
+  const handleOnOptionEnter = (elem: string) => {
+    handleOnHovered(elem);
+  };
+  const handleOnOptionLeave = () => {
+    handleOnHoveredLeave(selected.current);
+  };
   return (
     <>
       <OrthographicCamera />
@@ -196,38 +305,67 @@ const R3f: XR3f<any> = () => {
         position={[width * 2, -height + 3, -1]}
         scale={[Math.min(height / 3, width / 3), height / 5, 1]}
       >
-        {SelectionArray.map((v, i) => (
+        {SelectionArray.map((elem, i) => (
           <Text
-            key={v}
-            ref={(ref: MeshReffered) => (textArrayRef.current[i] = ref)}
-            userData={{ selection: v }}
+            key={elem}
+            ref={(ref: MeshReffered) => (textRefs.current[elem] = ref)}
+            userData={{ selection: elem }}
             position={[0, -i, 0]}
             renderOrder={-5}
             anchorX="center"
             anchorY="middle"
-            onPointerUp={(e) => handleOnSelected(e, v, i)}
-            onPointerEnter={(e) => handleOnHovered(e, v, i)}
-            onPointerDown={(e) => handleOnHovered(e, v, i)}
-            onPointerLeave={(e) => handleOnHoveredLeave(e, v, i)}
+            onPointerUp={() => handleOnSelected(elem)}
+            onPointerEnter={() => handleOnHovered(elem)}
+            onPointerDown={() => handleOnHovered(elem)}
+            onPointerLeave={() => handleOnHoveredLeave(elem)}
             onSync={(mesh) => {
               const blockBounds = { ...mesh.textRenderInfo.visibleBounds };
-              textBoundsRef.current[v] = new Box3(
+              textBoundsRef.current[elem] = new Box3(
                 new Vector3(blockBounds[0], blockBounds[1], 0),
                 new Vector3(blockBounds[2], blockBounds[3], 0)
               );
               if (i === 0) {
-                selected.current = v;
-                setDefaultBox(textBoundsRef.current[v]);
+                selected.current = elem;
+                setDefaultBox(textBoundsRef.current[elem]);
                 setDefaultX(mesh.position);
               }
             }}
             {...fontProps}
-            fillOpacity={selected.current === v ? 1 : hovered === v ? 0.5 : 0}
-            strokeOpacity={selected.current === v ? 1 : hovered === v ? 0.5 : 1}
+            fillOpacity={selected.current === elem ? 1 : hovered === elem ? 0.5 : 0}
+            strokeOpacity={selected.current === elem ? 1 : hovered === elem ? 0.5 : 1}
           >
-            {v}
+            {elem}
           </Text>
         ))}
+        <group
+          ref={optionGroupRef}
+          position={[0, 0, 0]}
+          scale={[Math.min(height / 3, width / 3) / 2, height / 5 / 2, 1]}
+        >
+          {OptionButtonArray.map((elem, i) => (
+            <Text
+              key={elem}
+              ref={(ref: MeshReffered) => (textRefs.current[elem] = ref)}
+              position={[MathUtils.clamp(width / 2 - width * (1 - i), -1, 1), 0, -1]}
+              renderOrder={-4}
+              anchorX="center"
+              anchorY="middle"
+              scale={[0, 1, 1]}
+              visible={false}
+              onPointerUp={() => handleOnOption(elem)}
+              onPointerEnter={() => handleOnOptionEnter(elem)}
+              onPointerDown={() => handleOnOptionEnter(elem)}
+              onPointerLeave={() => handleOnOptionLeave()}
+              {...fontProps}
+              fontSize={0.5}
+              strokeWidth={0.005}
+              fillOpacity={hovered === elem ? 1 : 0}
+              strokeOpacity={hovered === elem ? 1 : 1}
+            >
+              {elem}
+            </Text>
+          ))}
+        </group>
         <BoundaryHover
           box={hovered ? textBoundsRef.current[hovered] : defaultBox}
           to={hovered ? toVecRef.current : defaultX}
