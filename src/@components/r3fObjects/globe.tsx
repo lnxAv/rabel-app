@@ -55,6 +55,9 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
 
     window.addEventListener('mousemove', updateMouse);
     document.addEventListener('mouseout', handleActivityFalse);
+    document.addEventListener('touchend', handleActivityFalse);
+    document.addEventListener('touchcancel', handleActivityFalse);
+
     document.addEventListener('visibilitychange', (e) =>
       !e ? handleActivityFalse() : handleActivityTrue()
     );
