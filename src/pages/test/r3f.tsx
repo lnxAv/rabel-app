@@ -51,23 +51,43 @@ const R3f: XR3f<any> = () => {
   const [hovered, setHovered] = useState<string | null>(null);
   const [{ width, height }] = useThree((s) => [s.viewport, s.mouse]);
 
-  const doGlobeFrame = (a: number, delta: number) => {
+  const doGlobeFrame = (a2: number, topOffset: number, delta: number) => {
     if (!globeGroupRef.current) return;
-    if (a < 0.001) {
+    if (a2 < 0.001) {
       const defaultY = globeGroupRef.current.userData.defaultPosition[1];
       globeGroupRef.current.position.y = MathUtils.damp(
         globeGroupRef.current.position.y,
         defaultY,
-        4,
-        delta
-      );
-    } else {
-      globeGroupRef.current.position.y = MathUtils.damp(
-        globeGroupRef.current.position.y,
-        -height * a + 0.5,
         2,
         delta
       );
+    } else {
+      const a2Pos = -height * a2 + 0.6;
+      const isReady = textGroupRef.current.position.y - 1.5 > globeGroupRef.current.position.y;
+      // const precGlobe = globeGroupRef.current.position.y - 0.1;
+      // const precA2Pos = a2Pos;
+      // const isReady = precGlobe <= precA2Pos && Math.floor(a2);
+      if (!isReady) {
+        globeGroupRef.current.position.y = MathUtils.damp(
+          globeGroupRef.current.position.y,
+          a2Pos,
+          2,
+          delta
+        );
+      } else {
+        globeGroupRef.current.position.y = MathUtils.damp(
+          globeGroupRef.current.position.y,
+          Math.max(
+            Math.min(
+              a2Pos + topOffset - textGroupRef.current.position.y - data.offset * height + 2.5,
+              a2Pos
+            ),
+            -height * (data.pages - 1.9)
+          ),
+          3,
+          delta
+        );
+      }
     }
   };
 
@@ -108,7 +128,7 @@ const R3f: XR3f<any> = () => {
         } else if (isSelected && topOffset < textGroupRef.current.position.y - i - 1) {
           textRef.position.y = MathUtils.damp(
             textRef.position.y,
-            topOffset - textGroupRef.current.position.y + 1,
+            Math.max(topOffset - textGroupRef.current.position.y + 1, -height * (data.pages - 3.3)),
             9,
             delta
           );
@@ -126,10 +146,9 @@ const R3f: XR3f<any> = () => {
 
   useFrame((time, delta) => {
     const a1 = data.range(0.5 / 6, 0.07); // right-to-left
-    const a2 = data.range(0.5 / 6 + 0.035, 1.85 / 5 - (1 / 4 + 0.035)); // movr-to-bottom
-    const a3 = data.curve(1 / 6, 0.3); // Move sphere
+    const a2 = data.range(0.5 / 6 + 0.035, 1.85 / 5 - (1 / 4 + 0.035)); // move-to-bottom
     const stickyOffset = -height * ((data.pages - 1) * data.offset) + height * data.offset;
-    doGlobeFrame(a3, delta);
+    doGlobeFrame(a2, stickyOffset, delta);
     doTextFrame(a1, a2, stickyOffset, delta);
   });
 
@@ -162,6 +181,7 @@ const R3f: XR3f<any> = () => {
   const handleOnSelected = (e: ThreeEvent<MouseEvent>, v: string, index: number) => {
     clearTimeout(defaultBoxTimeout.current);
     selected.current = v;
+    setHovered(null);
     setDefaultBox(textBoundsRef.current[v]);
     setDefaultX(textArrayRef.current[SelectionArray.indexOf(selected.current) || 0].position);
     fromVecRef.current = textArrayRef.current[index].position;
