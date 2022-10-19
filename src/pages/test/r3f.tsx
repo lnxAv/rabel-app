@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box3, MathUtils, Vector3 } from 'three';
 
 import { BoundaryHover } from '../../@components/r3fObjects/BoundaryHover';
-import Globe from '../../@components/r3fObjects/globe';
+import Globe, { GlobeSpinningFunc } from '../../@components/r3fObjects/globe';
 import { GroupReffered, MeshReffered } from '../../@helpers/types';
 import { XR3f } from '../x-page';
 
@@ -43,6 +43,7 @@ type TextRef = {
 
 const R3f: XR3f<any> = () => {
   const isGlobeReady = useRef<boolean>(false);
+  const globeSpinningFunc = useRef<GlobeSpinningFunc | null>(null);
   const globeGroupRef = useRef<GroupReffered>(null);
   const optionGroupRef = useRef<GroupReffered>(null);
   const textGroupRef = useRef<GroupReffered>(null);
@@ -136,46 +137,6 @@ const R3f: XR3f<any> = () => {
             5,
             delta
           );
-          // Animate text Option at the end
-          /* if (optionGroupRef.current) {
-            const textOffset = (defaultBox?.max.y || 0) + (defaultBox?.min.y || 0);
-            OptionButtonArray.every((optionElem) => {
-              const optionRef = textRefs.current[optionElem];
-              if (!optionRef?.position) return false; // skip
-              if (isGlobeReady.current) {
-                optionRef.visible = true;
-                optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 1, 5, delta);
-                optionRef.rotation.x = MathUtils.damp(
-                  optionRef.rotation.x,
-                  MathUtils.radToDeg(0) * delta,
-                  5,
-                  delta
-                );
-              } else if (!isGlobeReady.current && optionRef.visible) {
-                // optionRef.visible = false;
-                optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 0, 5, delta);
-                if (optionRef.scale.x <= 0.1) {
-                  optionRef.visible = false;
-                }
-                optionRef.rotation.x = MathUtils.damp(
-                  optionRef.rotation.x,
-                  MathUtils.radToDeg(0.25),
-                  5,
-                  delta
-                );
-              } else {
-                optionRef.visible = false;
-              }
-              return true; // next
-            });
-            // Position
-            optionGroupRef.current.position.y = MathUtils.damp(
-              optionGroupRef.current.position.y,
-              textRef.position.y + textOffset - 0.4,
-              10,
-              delta
-            );
-          } */
         }
       }
       return true;
@@ -296,10 +257,24 @@ const R3f: XR3f<any> = () => {
   const handleOnOptionLeave = () => {
     handleOnHoveredLeave(selected.current);
   };
+
+  const handleGetSpinningFunc = (func: GlobeSpinningFunc) => {
+    globeSpinningFunc.current = func;
+  };
+
+  const handleDoSpinningFunc = (elem: string) => {
+    if (!globeSpinningFunc.current) return;
+    if (elem === 'PREV') {
+      globeSpinningFunc.current('left', 1.5);
+    } else {
+      globeSpinningFunc.current('right', 1);
+    }
+  };
+
   return (
     <>
       <OrthographicCamera />
-      <Globe ref={globeGroupRef} globeText={hovered} />
+      <Globe ref={globeGroupRef} globeText={hovered} getSpinFunc={handleGetSpinningFunc} />
       <group
         ref={textGroupRef}
         position={[width * 2, -height + 3, -1]}
@@ -352,6 +327,7 @@ const R3f: XR3f<any> = () => {
               anchorY="middle"
               scale={[0, 1, 1]}
               visible={false}
+              onClick={() => handleDoSpinningFunc(elem)}
               onPointerUp={() => handleOnOption(elem)}
               onPointerEnter={() => handleOnOptionEnter(elem)}
               onPointerDown={() => handleOnOptionEnter(elem)}
