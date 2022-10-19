@@ -1,6 +1,7 @@
 import { Html, Sphere } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useRef, useState } from 'react';
+import { MathUtils } from 'three';
 
 import { GroupReffered } from '../../@helpers/types';
 import CartesianShader from '../../@styles/shader/cartesian/component';
@@ -9,15 +10,18 @@ import { RhombicDodecaedronLines } from '../x/x-shapes/rhombic_dodecahedron';
 import AnimatedLine from './animatedLine';
 import LoadingGlobe from './loadingGlobe';
 
-/* eslint-enable no-unused-vars */
-const sg = {
-  radius: 0.9,
-  widthSegment: 32,
-  heightSegment: 15,
-  phiStart: 0,
-  phiLength: Math.PI * 2,
-  thetaStart: 0,
-  thetaLength: Math.PI,
+const GlobeSettings = {
+  args: {
+    radius: 0.9,
+    widthSegment: 32,
+    heightSegment: 15,
+    phiStart: 0,
+    phiLength: Math.PI * 2,
+    thetaStart: 0,
+    thetaLength: Math.PI,
+  },
+  defaultScale: 1.1,
+  defaultPos: [0, 0, 0],
 };
 
 const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
@@ -27,22 +31,16 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
   const horizontalRef = useRef<number>(0);
   const [startBlur, setStartBlur] = useState<boolean>(true);
   const windowFocus = useRef<boolean>(false);
-  // const data = useScroll();
-  const { size } = useThree();
+  const [{ width: pWidth, height: pHeight }] = useThree((s) => [s.size]);
 
   const updateMouse = (e: any) => {
     if (!windowFocus.current) {
       windowFocus.current = true;
     }
-    const newVertical = 1 - e.y / size.height;
-    const newHorizontal = 1 - e.x / size.width;
-    setVertical(newVertical);
-    if (globeRef?.current) {
-      globeRef.current.rotation.y = newHorizontal;
-      globeRef.current.rotation.x = newVertical;
-    }
-
+    const newHorizontal = (pWidth - e.x) / pWidth;
+    const newVertical = (pHeight - e.y) / pHeight;
     horizontalRef.current = newHorizontal;
+    verticalRef.current = newVertical;
   };
 
   useEffect(() => {
@@ -70,7 +68,12 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
     verticalRef.current += 0.3 * delta;
     verticalRef.current %= 1;
     setVertical(verticalRef.current);
-    globeRef.current.rotation.x += 0.2 * delta;
+    globeRef.current.rotation.y += 0.2 * delta;
+  };
+
+  const updateFrameMouse = () => {
+    globeRef.current.rotation.y = MathUtils.degToRad(horizontalRef.current * 360);
+    setVertical(verticalRef.current);
   };
 
   useFrame((time, delta) => {
@@ -82,7 +85,7 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
       windowFocus.current = false;
       setStartBlur(false);
     } else {
-      setVertical((state) => state + 0.00001);
+      updateFrameMouse();
     }
   });
 
@@ -111,11 +114,14 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
       <mesh rotation={[0, -0.6, 0]}>
         <group ref={globeRef}>
           {/* @ts-ignore */}
-          <Sphere scale={1} args={[...Object.values(sg)]}>
+          <Sphere args={[...Object.values(GlobeSettings.args)]} scale={GlobeSettings.defaultScale}>
             <CartesianShader u={{ hue: [255, 0, 41], sharpness: 0.5, opacityA: 1.5 }} />
           </Sphere>
           <RhombicDodecaedronLines color="rgba(255, 0, 41, 0)" scale={0.45} opacity={0} />
-          <LoadingGlobe phiLength={sg.phiLength} thetaLength={sg.thetaLength} />
+          <LoadingGlobe
+            phiLength={GlobeSettings.args.phiLength}
+            thetaLength={GlobeSettings.args.thetaLength}
+          />
         </group>
         <Html transform scale={[0.2, 0.2, 0.2]} position={[0, 0, 0]} rotation={[0, 0, 0]}>
           <BreathingBox
@@ -146,7 +152,7 @@ const Globe = React.forwardRef<GroupReffered, any>((props, ref) => {
           dashRatio={0.5}
           widthCallback={(p: number) =>
             animatedLineWidth(
-              vertical,
+              verticalRef.current,
               p,
               0.01,
               Math.sin(horizontalRef.current / 2 + 0.5) * 0.2,

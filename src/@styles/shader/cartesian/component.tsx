@@ -59,7 +59,7 @@ const CartesianShader = memo(
         meshRef.current.uniforms.cartesianX.value = u?.cartesianX !== undefined ? u.cartesianX : 2;
         meshRef.current.uniforms.cartesianY.value = u?.cartesianY !== undefined ? u.cartesianY : 2;
         meshRef.current.uniforms.cartesianZ.value = u?.cartesianZ !== undefined ? u.cartesianZ : 2;
-        meshRef.current.uniforms.width.value = u?.width !== undefined ? u.width : 1;
+        meshRef.current.uniforms.width.value = u?.width !== undefined ? u.width : 1.1;
         meshRef.current.uniforms.sharpness.value = u?.sharpness !== undefined ? u.sharpness : 1000;
         meshRef.current.uniforms.opacityA.value = u?.opacityA !== undefined ? u.opacityA : 1;
         const newHue = hue;
@@ -68,9 +68,9 @@ const CartesianShader = memo(
         meshRef.current.uniforms.hue.value = newHue;
       }
     }, [meshRef, u]);
-    useFrame((time) => {
+    useFrame((time, delta) => {
       if (meshRef?.current) {
-        meshRef.current.uniforms.time.value = time.clock.elapsedTime;
+        meshRef.current.uniforms.time.value = time.clock.elapsedTime + delta;
       }
     });
 
