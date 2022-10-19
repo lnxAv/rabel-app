@@ -13,7 +13,9 @@ const CartesianMaterial = shaderMaterial(
     cartesianZ: Math.PI * 1.15,
     width: 1,
     sharpness: 1,
+    acceleration: 0,
     opacityA: 1,
+    opacityB: 0,
     time: 0,
     hue: new Vector3(244, 47, 213),
   },
@@ -44,12 +46,14 @@ type Uniforms = {
     width?: number;
     sharpness?: number;
     opacityA?: number;
+    opacityB?: number;
     hue?: [number, number, number];
   };
+  acceleration?: number;
 };
 
 const CartesianShader = memo(
-  ({ u, ...props }: Partial<ShaderMaterial> & Uniforms) => {
+  ({ u, acceleration, ...props }: Partial<ShaderMaterial> & Uniforms) => {
     const meshRef = useRef<ShaderMaterial>(null);
     const [hue, setHue] = useState<Vector3>(
       new Vector3(u?.hue?.[0] || 0, u?.hue?.[1] || 0, u?.hue?.[2] || 0)
@@ -62,12 +66,14 @@ const CartesianShader = memo(
         meshRef.current.uniforms.width.value = u?.width !== undefined ? u.width : 1.1;
         meshRef.current.uniforms.sharpness.value = u?.sharpness !== undefined ? u.sharpness : 1000;
         meshRef.current.uniforms.opacityA.value = u?.opacityA !== undefined ? u.opacityA : 1;
+        meshRef.current.uniforms.opacityB.value = u?.opacityB !== undefined ? u.opacityB : 0;
         const newHue = hue;
         newHue.set(u?.hue?.[0] || 0, u?.hue?.[1] || 0, u?.hue?.[2] || 0);
         setHue(newHue);
         meshRef.current.uniforms.hue.value = newHue;
       }
     }, [meshRef, u]);
+
     useFrame((time, delta) => {
       if (meshRef?.current) {
         meshRef.current.uniforms.time.value = time.clock.elapsedTime + delta;
