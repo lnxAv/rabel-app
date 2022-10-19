@@ -1,4 +1,4 @@
-import { Html, Sphere } from '@react-three/drei';
+import { Cylinder, Html, Sphere } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
@@ -11,8 +11,17 @@ import AnimatedLine from './animatedLine';
 import LoadingGlobe from './loadingGlobe';
 
 export type GlobeSpinningFunc = (direction: 'left' | 'right' | null, amount?: number) => void;
+export enum GlobeState {
+  Loading,
+  About,
+  Tools,
+  Project,
+  Other,
+}
+
 type Props = {
   globeText?: string | null;
+  globeState?: GlobeState;
   getSpinFunc?: (func: (direction: 'left' | 'right' | null, amount?: number) => void) => void;
 };
 
@@ -32,14 +41,16 @@ const GlobeSettings = {
 
 const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
   const globeRef = useRef<GroupReffered>(null);
+  const bodyRef = useRef<GroupReffered>(null);
+  const contentRef = useRef<GroupReffered>(null);
   const [vertical, setVertical] = useState<number>(0); // is needed to update frame
   const verticalRef = useRef<number>(0); // vertical-mouse
   const horizontalRef = useRef<number>(0); // horizontal-mouse
   const [startBlur, setStartBlur] = useState<boolean>(true);
   const isSpinning = useRef<boolean>(false);
   const spinningTo = useRef<number>(0);
-  // const [isBlinking, setIsBlinking] = useState<boolean>(true);
-  // const [bingAmount, setBlinkingAmount] = useState<boolean>(true);
+  const switchingStateTo = useRef<GlobeState | null>(null);
+  const currentState = useRef<GlobeState>(GlobeState.Loading);
   const windowFocus = useRef<boolean>(false);
   const [{ width: pWidth, height: pHeight }] = useThree((s) => [s.size]);
 
@@ -59,10 +70,11 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
       const path = direction === 'left' ? 1 : -1;
       const rad = MathUtils.degToRad(360 * spin * path);
       isSpinning.current = true;
-      spinningTo.current = rad + globeRef.current.rotation.y;
+      spinningTo.current = rad + bodyRef.current.rotation.y;
     } else {
       isSpinning.current = false;
       globeRef.current.rotation.y -= spinningTo.current;
+      contentRef.current.rotation.y = globeRef.current.rotation.y;
     }
   };
 
@@ -78,7 +90,6 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     if (props.getSpinFunc) {
       props.getSpinFunc(startSpinning);
     }
-
     window.addEventListener('mousemove', updateMouse);
     document.addEventListener('mouseout', handleActivityFalse);
     document.addEventListener('touchend', handleActivityFalse);
@@ -91,18 +102,22 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     document.addEventListener('focus', handleActivityTrue);
   }, []);
 
+  useEffect(() => {
+    switchingStateTo.current = props.globeState || GlobeState.Loading;
+  }, [props.globeState]);
   const updateFrame = (delta: number) => {
     verticalRef.current += 0.3 * delta;
     verticalRef.current %= 1;
     setVertical(verticalRef.current);
     globeRef.current.rotation.y += 0.2 * delta;
+    contentRef.current.rotation.y = globeRef.current.rotation.y;
   };
 
   const updateFrameMouse = () => {
     setVertical(verticalRef.current);
-
     if (!isSpinning.current) {
       globeRef.current.rotation.y = MathUtils.degToRad(horizontalRef.current * 360);
+      contentRef.current.rotation.y = globeRef.current.rotation.y;
     }
   };
 
@@ -114,12 +129,105 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
           : Math.min(Math.abs(spinningTo.current) / Math.PI, -10);
       const step = strength * delta;
       globeRef.current.rotation.y += step;
+      contentRef.current.rotation.y = globeRef.current.rotation.y;
+
       if (globeRef.current.rotation.y.toPrecision(1) === spinningTo.current.toPrecision(1)) {
         startSpinning(null);
       }
     }
   };
 
+  const a = MathUtils.damp; // short
+
+  const frameStateLoading = (delta: number) => {
+    if (!bodyRef.current) return;
+    if (
+      switchingStateTo.current === GlobeState.Loading ||
+      switchingStateTo.current === GlobeState.Other
+    ) {
+      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1, 4, delta);
+      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1, 4, delta);
+      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1, 4, delta);
+      // globeRef.current.scale.set(1, 1, 1);
+      globeRef.current.scale.x = a(globeRef.current.scale.x, 1, 4, delta);
+      globeRef.current.scale.y = a(globeRef.current.scale.y, 1, 4, delta);
+      globeRef.current.scale.z = a(globeRef.current.scale.z, 1, 4, delta);
+      // after x amount of time
+      currentState.current = GlobeState.Loading;
+      // switchingStateTo.current = null;
+    }
+  };
+
+  const frameStateAbout = (delta: number) => {
+    if (!bodyRef.current) return;
+    if (switchingStateTo.current === GlobeState.About) {
+      // body
+      bodyRef.current.position.y = a(bodyRef.current.position.y, 0.8, 4, delta);
+      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 0.7, 4, delta);
+      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 0.7, 4, delta);
+      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 0.7, 4, delta);
+      // globe
+      globeRef.current.scale.x = a(globeRef.current.scale.x, 0, 4, delta);
+      globeRef.current.scale.y = a(globeRef.current.scale.y, 0, 4, delta);
+      globeRef.current.scale.z = a(globeRef.current.scale.z, 0, 4, delta);
+      // after x amount of time
+      currentState.current = GlobeState.About;
+      // switchingStateTo.current = null;
+    }
+  };
+
+  const frameStateTools = (delta: number) => {
+    if (!bodyRef.current) return;
+    if (switchingStateTo.current === GlobeState.Tools) {
+      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1, 4, delta);
+      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1, 4, delta);
+      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1, 4, delta);
+      // globeRef.current.scale.set(1, 1, 1);
+      globeRef.current.scale.x = a(globeRef.current.scale.x, 0.9, 4, delta);
+      globeRef.current.scale.y = a(globeRef.current.scale.y, 0.9, 4, delta);
+      globeRef.current.scale.z = a(globeRef.current.scale.z, 0.9, 4, delta);
+      // after x amount of time
+      currentState.current = GlobeState.Tools;
+      // switchingStateTo.current = null;
+    }
+  };
+
+  const frameStateProjects = (delta: number) => {
+    if (!bodyRef.current) return;
+    if (switchingStateTo.current === GlobeState.Project) {
+      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1.1, 4, delta);
+      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1.1, 4, delta);
+      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1.1, 4, delta);
+      // globeRef.current.scale.set(1, 1, 1);
+      globeRef.current.scale.x = a(globeRef.current.scale.x, 1.1, 4, delta);
+      globeRef.current.scale.y = a(globeRef.current.scale.y, 1.1, 4, delta);
+      globeRef.current.scale.z = a(globeRef.current.scale.z, 1.1, 4, delta);
+      // after x amount of time
+      currentState.current = GlobeState.Project;
+      // switchingStateTo.current = null;
+    }
+  };
+
+  const doStateFrameLoop = (delta: number) => {
+    switch (switchingStateTo.current) {
+      case GlobeState.About:
+        frameStateAbout(delta);
+        break;
+      case GlobeState.Tools:
+        frameStateTools(delta);
+        break;
+      case GlobeState.Project:
+        frameStateProjects(delta);
+        break;
+      case GlobeState.Loading:
+      default:
+        frameStateLoading(delta);
+        break;
+    }
+  };
   useFrame((time, delta) => {
     if (!windowFocus.current && !startBlur) {
       updateFrame(delta);
@@ -132,6 +240,7 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
       updateFrameMouse();
     }
     doSpinningFrame(delta);
+    doStateFrameLoop(delta);
   });
 
   const animatedLineWidth = (
@@ -161,7 +270,7 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
       userData={{ defaultPosition: [0, 0.5, 0] }}
       scale={1.4}
     >
-      <mesh rotation={[0, -0.6, 0]}>
+      <group ref={bodyRef} rotation={[0, -0.6, 0]}>
         <group ref={globeRef}>
           {/* @ts-ignore */}
           <Sphere args={[...Object.values(GlobeSettings.args)]} scale={GlobeSettings.defaultScale}>
@@ -173,16 +282,18 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
             opacity={0}
             renderOrder={10}
           />
+          <group visible={props.globeState === GlobeState.Loading}>
+            <LoadingGlobe
+              phiLength={GlobeSettings.args.phiLength}
+              thetaLength={GlobeSettings.args.thetaLength}
+            />
+          </group>
         </group>
-        <LoadingGlobe
-          phiLength={GlobeSettings.args.phiLength}
-          thetaLength={GlobeSettings.args.thetaLength}
-        />
-        <Html>
-          <button type="button" onClick={() => startSpinning('left', 1)}>
-            xxx
-          </button>
-        </Html>
+        <group ref={contentRef} visible={props.globeState !== GlobeState.Loading}>
+          <group visible={props.globeState === GlobeState.About}>
+            <Cylinder />
+          </group>
+        </group>
         <Html transform scale={0.2} position={[0, 0.2, 0]} rotation={[0, 0, 0]}>
           <BreathingBox
             style={{
@@ -220,7 +331,7 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
             )
           }
         />
-      </mesh>
+      </group>
     </group>
   );
 });

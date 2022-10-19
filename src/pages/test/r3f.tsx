@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box3, MathUtils, Vector3 } from 'three';
 
 import { BoundaryHover } from '../../@components/r3fObjects/BoundaryHover';
-import Globe, { GlobeSpinningFunc } from '../../@components/r3fObjects/globe';
+import Globe, { GlobeSpinningFunc, GlobeState } from '../../@components/r3fObjects/globe';
 import { GroupReffered, MeshReffered } from '../../@helpers/types';
 import { XR3f } from '../x-page';
 
@@ -30,7 +30,7 @@ const fontProps = {
   strokeWidth: 0.01,
 };
 
-const SelectionArray = ['ABOUT', 'TOOLS', 'PRJCT', 'REACH'];
+const SelectionArray = ['ABOUT', 'TOOLS', 'PRJCT', 'OTHER'];
 const OptionButtonArray = ['PREV', 'NEXT'];
 
 type TextBounds = {
@@ -49,15 +49,24 @@ const R3f: XR3f<any> = () => {
   const textGroupRef = useRef<GroupReffered>(null);
   const textRefs = useRef<TextRef>({});
   const textBoundsRef = useRef<TextBounds>({});
-  const [defaultBox, setDefaultBox] = useState<Box3 | undefined>(undefined);
-  const [defaultX, setDefaultX] = useState<Vector3 | undefined>(undefined);
-  const defaultBoxTimeout = useRef<number | undefined | ReturnType<typeof setTimeout>>(undefined);
+  const [defaultBound, setDefaultBound] = useState<Box3 | undefined>(undefined);
+  const [defaultCenter, setDefaultCenter] = useState<Vector3 | undefined>(undefined);
+  const defaultBoundTimeout = useRef<number | undefined | ReturnType<typeof setTimeout>>(undefined);
   const toVecRef = useRef<Vector3>(new Vector3(0));
   const fromVecRef = useRef<Vector3>(new Vector3(0));
-  const data = useScroll();
   const selected = useRef<string>('');
+  const [globeState, setGlobeState] = useState<GlobeState>(GlobeState.Loading);
   const [hovered, setHovered] = useState<string | null>(null);
+
+  const data = useScroll();
   const [{ width, height }] = useThree((s) => [s.viewport, s.mouse]);
+
+  useEffect(() => {
+    if (hovered) document.body.style.cursor = 'pointer';
+    return () => {
+      document.body.style.cursor = 'auto';
+    };
+  }, [hovered]);
 
   const doGlobeFrame = (a2: number, topOffset: number, delta: number) => {
     if (!globeGroupRef.current) return;
@@ -146,7 +155,7 @@ const R3f: XR3f<any> = () => {
   const doTextOptionFrame = (a2: number, delta: number) => {
     // Animate text Option at the end
     if (optionGroupRef.current) {
-      const textOffset = (defaultBox?.max.y || 0) + (defaultBox?.min.y || 0);
+      const textOffset = (defaultBound?.max.y || 0) + (defaultBound?.min.y || 0);
       const textRef = textRefs.current[selected.current];
       OptionButtonArray.every((optionElem) => {
         const optionRef = textRefs.current[optionElem];
@@ -187,18 +196,37 @@ const R3f: XR3f<any> = () => {
         );
     }
   };
-  useEffect(() => {
-    if (hovered) document.body.style.cursor = 'pointer';
-    return () => {
-      document.body.style.cursor = 'auto';
-    };
-  }, [hovered]);
+
+  const handleGlobeState = (elem: string | null) => {
+    switch (elem) {
+      case 'ABOUT':
+        setGlobeState(GlobeState.About);
+        break;
+      case 'PRJCT':
+        setGlobeState(GlobeState.Project);
+        break;
+      case 'TOOLS':
+        setGlobeState(GlobeState.Tools);
+        break;
+      case 'OTHER':
+        setGlobeState(GlobeState.Other);
+        break;
+      default:
+        setGlobeState(GlobeState.Loading);
+        break;
+    }
+  };
 
   useFrame((time, delta) => {
     const a1 = data.range(0.5 / 6, 0.07); // right-to-left
     const a2 = data.range(0.5 / 6 + 0.035, 1.85 / 5 - (1 / 4 + 0.035)); // move-to-bottom
     const stickyOffset = -height * ((data.pages - 1) * data.offset) + height * data.offset;
     isGlobeReady.current = data.visible(2.4 / 4, 0.7 / 4);
+    if (isGlobeReady.current) {
+      handleGlobeState(selected.current);
+    } else if (!isGlobeReady.current && globeState !== GlobeState.Loading && a2 >= 0.99) {
+      handleGlobeState(null);
+    }
     doGlobeFrame(a2, stickyOffset, delta);
     doTextFrame(a1, a2, stickyOffset, delta);
     doTextOptionFrame(a2, delta);
@@ -206,8 +234,8 @@ const R3f: XR3f<any> = () => {
 
   const handleOnHovered = (hoveredElem: string, boxElem?: string) => {
     setHovered(hoveredElem);
-    if (defaultBox) {
-      setDefaultBox(undefined);
+    if (defaultBound) {
+      setDefaultBound(undefined);
     }
     const vecElem = boxElem || hoveredElem;
     toVecRef.current = textRefs.current[vecElem || ''].position || null;
@@ -218,30 +246,31 @@ const R3f: XR3f<any> = () => {
     setHovered(null);
     if (hoveredElem === selected.current) {
       selected.current = hoveredElem;
-      setDefaultBox(textBoundsRef.current[hoveredElem]);
-      setDefaultX(textRefs.current[selected.current || '']?.position || null);
-      clearTimeout(defaultBoxTimeout.current);
+      setDefaultBound(textBoundsRef.current[hoveredElem]);
+      setDefaultCenter(textRefs.current[selected.current || '']?.position || null);
+      clearTimeout(defaultBoundTimeout.current);
     } else {
-      clearTimeout(defaultBoxTimeout.current);
-      defaultBoxTimeout.current = setTimeout(() => {
-        setDefaultBox(textBoundsRef.current[hoveredElem]);
-        setDefaultX(textRefs.current[selected.current || '']?.position || null);
+      clearTimeout(defaultBoundTimeout.current);
+      defaultBoundTimeout.current = setTimeout(() => {
+        setDefaultBound(textBoundsRef.current[hoveredElem]);
+        setDefaultCenter(textRefs.current[selected.current || '']?.position || null);
       }, 500);
     }
     fromVecRef.current = textRefs.current[hoveredElem || '']?.position || null;
   };
 
   const handleOnSelected = (elem: string) => {
-    clearTimeout(defaultBoxTimeout.current);
+    clearTimeout(defaultBoundTimeout.current);
     selected.current = elem;
+    // handleGlobeState(elem);
     setHovered(null);
-    setDefaultBox(textBoundsRef.current[elem]);
-    setDefaultX(textRefs.current[elem || '']?.position || null);
+    setDefaultBound(textBoundsRef.current[elem]);
+    setDefaultCenter(textRefs.current[elem || '']?.position || null);
     fromVecRef.current = textRefs.current[elem || '']?.position || null;
   };
 
   const handleOnOption = (elem: string) => {
-    clearTimeout(defaultBoxTimeout.current);
+    clearTimeout(defaultBoundTimeout.current);
     let newSelection = SelectionArray.indexOf(selected.current);
     if (elem === 'NEXT') {
       newSelection++;
@@ -249,6 +278,7 @@ const R3f: XR3f<any> = () => {
     } else if (elem === 'PREV') {
       newSelection = newSelection === 0 ? SelectionArray.length - 1 : newSelection - 1;
     }
+    handleGlobeState(SelectionArray[newSelection]);
     handleOnSelected(SelectionArray[newSelection]);
   };
   const handleOnOptionEnter = (elem: string) => {
@@ -274,7 +304,12 @@ const R3f: XR3f<any> = () => {
   return (
     <>
       <OrthographicCamera />
-      <Globe ref={globeGroupRef} globeText={hovered} getSpinFunc={handleGetSpinningFunc} />
+      <Globe
+        ref={globeGroupRef}
+        globeText={hovered}
+        getSpinFunc={handleGetSpinningFunc}
+        globeState={globeState || GlobeState.Loading}
+      />
       <group
         ref={textGroupRef}
         position={[width * 2, -height + 3, -1]}
@@ -301,8 +336,8 @@ const R3f: XR3f<any> = () => {
               );
               if (i === 0) {
                 selected.current = elem;
-                setDefaultBox(textBoundsRef.current[elem]);
-                setDefaultX(mesh.position);
+                setDefaultBound(textBoundsRef.current[elem]);
+                setDefaultCenter(mesh.position);
               }
             }}
             {...fontProps}
@@ -343,8 +378,8 @@ const R3f: XR3f<any> = () => {
           ))}
         </group>
         <BoundaryHover
-          box={hovered ? textBoundsRef.current[hovered] : defaultBox}
-          to={hovered ? toVecRef.current : defaultX}
+          box={hovered ? textBoundsRef.current[hovered] : defaultBound}
+          to={hovered ? toVecRef.current : defaultCenter}
           from={!hovered ? fromVecRef.current : undefined}
         />
       </group>
