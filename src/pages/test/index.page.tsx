@@ -1,7 +1,8 @@
 import Head from 'next/head';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
+  BreathingBox,
   CircleText,
   TypeLine,
   TypePill,
@@ -67,9 +68,32 @@ const CenteredText = styled.div`
   margin: auto;
 `;
 
+type LiveDate = {
+  day: string;
+  year: number;
+  hours: number;
+  minute: number;
+};
+
+const getLiveDate = (date: Date): LiveDate => ({
+  day: date.toLocaleString('en-us', { weekday: 'short' }),
+  year: date.getFullYear(),
+  hours: date.getHours(),
+  minute: date.getMinutes(),
+});
 const Test: XPage = ({ title }: any) => {
   const date = useRef(new Date());
-  useEffect(() => {}, []);
+  const timeInterval = useRef<any>(null);
+  const [liveDate, setLiveDate] = useState<LiveDate>(getLiveDate(date.current));
+  useEffect(() => {
+    timeInterval.current = setInterval(() => {
+      date.current.setSeconds(date.current.getSeconds() + 1);
+      setLiveDate(getLiveDate(date.current));
+    }, 1000);
+    return () => {
+      clearInterval(timeInterval.current);
+    };
+  }, []);
   return (
     <>
       <Head>
@@ -80,12 +104,23 @@ const Test: XPage = ({ title }: any) => {
           <div
             className="extension"
             style={{
+              display: 'flex',
+              flexDirection: 'row',
               fontSize: '15px',
               fontFamily: 'project-space, monospace',
             }}
           >
-            `{date.current.toLocaleString('en-us', { weekday: 'short' })}
-            {date.current.getFullYear()}.
+            <div>
+              `{liveDate.day}
+              {liveDate.year}|
+            </div>
+            <div style={{ fontSize: '15px', fontFamily: 'dot16' }}>
+              {liveDate.hours}
+              <BreathingBox>
+                <p>:</p>
+              </BreathingBox>
+              {liveDate.minute}
+            </div>
           </div>
           <div className="navigation">RABL | v0.1</div>
         </Header>
@@ -225,7 +260,7 @@ export async function getStaticProps({ locale }: any) {
 R3f.scrollControls = {
   pages: 4,
   damping: 8,
-  distance: 2,
+  distance: 1,
   scrollR3f: true,
 };
 

@@ -320,6 +320,7 @@ const R3f: XR3f<any> = () => {
               display: 'flex',
               flexDirection: 'column',
               width: '100vw',
+              maxWidth: '700px',
               margin: 'auto',
               padding: '5vw 5px',
               textAlign: 'left',
@@ -380,7 +381,7 @@ const R3f: XR3f<any> = () => {
             anchorX="center"
             anchorY="middle"
             onClick={() => {
-              data.el.scroll(0, pHeight * (2.7 * 2));
+              data.el.scroll(0, pHeight * (2.7 * 1)); // pHeight * (posWanted * scrollDistance)
             }}
             onPointerUp={() => handleOnSelected(elem)}
             onPointerEnter={() => handleOnHovered(elem)}
