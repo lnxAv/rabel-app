@@ -33,8 +33,9 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
 
   return (
     <mesh key={context.key} ref={mesh}>
-      <Html transform style={{ pointerEvents: 'none' }}>
+      <Html transform sprite style={{ pointerEvents: 'none' }}>
         <GlobeEffectHtml title="> loading" />
+        <meshDepthMaterial />
       </Html>
     </mesh>
   );
@@ -47,11 +48,15 @@ const LoadingGlobe = ({ phiLength, thetaLength }: Props) => {
       theta: Math.random() * phiLength,
     }),
     reserve: 5,
-    activeAtStart: 50,
+    activeAtStart: 30,
     limit: 50,
   });
 
-  return <group renderOrder={-1}>{pool.activeMap((poolItem) => poolItem.object)}</group>;
+  return (
+    <group renderOrder={-1} visible={false}>
+      {pool.activeMap((poolItem) => poolItem.object)}
+    </group>
+  );
 };
 
 export default LoadingGlobe;

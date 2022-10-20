@@ -8,6 +8,7 @@ import CartesianShader from '../../@styles/shader/cartesian/component';
 import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
 import AnimatedLine from './animatedLine';
 import AboutItem from './globeItems/aboutItem';
+import WordGlobe from './globeItems/wordCloud';
 import LoadingGlobe from './loadingGlobe';
 
 export type GlobeSpinningFunc = (direction: 'left' | 'right' | null, amount?: number) => void;
@@ -279,10 +280,20 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
             />
           </Sphere>
           <group visible={props.globeState === GlobeState.Loading}>
-            <LoadingGlobe
-              phiLength={GlobeSettings.args.phiLength}
-              thetaLength={GlobeSettings.args.thetaLength}
-            />
+            {props.globeState === GlobeState.Loading ? (
+              <LoadingGlobe
+                phiLength={GlobeSettings.args.phiLength}
+                thetaLength={GlobeSettings.args.thetaLength}
+              />
+            ) : null}
+          </group>
+          <group visible={props.globeState === GlobeState.Tools}>
+            {props.globeState === GlobeState.Tools ? (
+              <WordGlobe
+                phiLength={GlobeSettings.args.phiLength}
+                thetaLength={GlobeSettings.args.thetaLength}
+              />
+            ) : null}
           </group>
         </group>
 

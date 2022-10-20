@@ -113,16 +113,18 @@ export const useObjectPool = <P,>(
   // Create a new item with a pre-defined or re-defined PoolableComponent
   function createPoolItem(
     itemKey: ItemKey,
-    poolItemCreatorOverwrite?: PoolableComponent
+    poolItemCreatorOverwrite?: PoolableComponent,
+    initialPropsOverwrite?: () => P
   ): PoolItem {
     const poolItemCreator = poolItemCreatorOverwrite || poolItemCreation;
+    const propsCreator = initialPropsOverwrite || initialProps;
     const context: ItemContext = {
       key: itemKey,
       recycle: () => recycleItem(itemKey),
       update: (itemProps) => update(itemKey, itemProps),
       delete: () => deleteItem(itemKey),
     };
-    const itemProps = initialProps ? initialProps() : undefined;
+    const itemProps = propsCreator ? propsCreator() : undefined;
     action.createItem(itemKey, {
       context,
       itemProps,
@@ -217,10 +219,17 @@ export const useObjectPool = <P,>(
     }
   }
   // Add a poolItem with a re-defined PoolableComponent
-  function addCustomPoolItem(poolItemCreationOverwrite: PoolableComponent): PoolItem | null {
+  function addCustomPoolItem(
+    poolItemCreationOverwrite: PoolableComponent,
+    initialPropsOverwrite: () => P
+  ): PoolItem | null {
     if (numberActive.current + numberReserved.current < limit) {
       const newKey = generateItemKey();
-      poolItems.current[newKey] = createPoolItem(newKey, poolItemCreationOverwrite);
+      poolItems.current[newKey] = createPoolItem(
+        newKey,
+        poolItemCreationOverwrite,
+        initialPropsOverwrite
+      );
       numberActive.current += 1;
       activeItemRecord.current[newKey] = poolItems.current[newKey];
       return poolItems.current[newKey];
