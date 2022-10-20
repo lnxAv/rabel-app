@@ -35,7 +35,6 @@ const Instance: PoolableComponent = ({ context }: PoolItemCreationProps) => {
     <mesh key={context.key} ref={mesh}>
       <Html transform sprite style={{ pointerEvents: 'none' }}>
         <GlobeEffectHtml title="> loading" />
-        <meshDepthMaterial />
       </Html>
     </mesh>
   );

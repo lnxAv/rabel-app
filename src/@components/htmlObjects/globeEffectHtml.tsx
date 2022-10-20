@@ -115,7 +115,7 @@ export const ShapeBox = styled.div`
 `;
 
 const Loading = ({ title }: { title: string }) => (
-  <p style={{ display: 'flex' }}>
+  <div style={{ display: 'flex' }}>
     {' '}
     {title}
     <span>
@@ -126,7 +126,7 @@ const Loading = ({ title }: { title: string }) => (
         }}
       />
     </span>
-  </p>
+  </div>
 );
 export const TypeWriting = ({ timedLines = [] }: UIProps) => {
   const [toggleCursor, setToggleCursor] = useState(false);
