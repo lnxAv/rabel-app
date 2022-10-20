@@ -319,35 +319,38 @@ const R3f: XR3f<any> = () => {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              width: '50vw',
+              width: '100vw',
               margin: 'auto',
-              padding: '0 5px',
+              padding: '5vw 5px',
               textAlign: 'left',
               borderLeft: '1px solid red',
               background: 'rgba(0, 0, 0, 0.5)',
             }}
           >
-            <div>Hi, I am</div>
             <div style={{ position: 'relative', paddingLeft: '32px' }}>
               <div style={{ position: 'absolute', left: '0px' }}>
                 <p>{'>'}</p>
               </div>
               <span>
                 <TypewriterComponent
-                  options={{ loop: true, delay: 250, deleteSpeed: 350, cursor: '&block;' }}
+                  options={{ loop: true, delay: 200, deleteSpeed: 100, cursor: '&block;' }}
                   onInit={(typewriter) => {
                     typewriter
-                      .typeString('Pierre')
-                      .deleteAll()
-                      .typeString('a Programmer')
-                      .deleteAll()
-                      .changeDelay(180)
-                      .typeString('forever a student')
-                      .deleteAll()
-                      .changeDelay(250)
-                      .typeString('a tinkerer')
-                      .deleteAll()
-                      .typeString('Rabel')
+                      .typeString('in develo')
+                      .deleteChars(6)
+                      .typeString('construnction  ')
+                      .deleteChars(1)
+                      .typeString('👷🏽‍♂️ ')
+                      .pauseFor(500)
+                      .deleteChars(2)
+                      .typeString('⚒️')
+                      .pauseFor(300)
+                      .deleteChars(2)
+                      .typeString('🛠️')
+                      .pauseFor(300)
+                      .deleteChars(3)
+                      .typeString('🚧')
+                      .pauseFor(500)
                       .start();
                   }}
                 />

@@ -38,7 +38,7 @@ const Oups = () => {
           <div style={{ color: 'red' }}>{oups.current.text}</div>
           <div style={{ fontSize: '5px', whiteSpace: 'pre-line' }}>{oups.current.message}</div>
           <div style={{ position: 'absolute', fontSize: '3px', bottom: -5, right: 0 }}>
-            ..in development
+            ..in construction
           </div>
         </div>
       </Html>
