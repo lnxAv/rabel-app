@@ -8,6 +8,7 @@ import CartesianShader from '../../@styles/shader/cartesian/component';
 import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
 import AnimatedLine from './animatedLine';
 import AboutItem from './globeItems/aboutItem';
+import Oups from './globeItems/oups';
 import WordGlobe from './globeItems/wordCloud';
 import LoadingGlobe from './loadingGlobe';
 
@@ -296,12 +297,17 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
             ) : null}
           </group>
         </group>
-
         <group ref={contentRef} visible={props.globeState !== GlobeState.Loading}>
           <group visible={props.globeState === GlobeState.About}>
             <AboutItem visible={props.globeState === GlobeState.About} />
             <pointLight position={[-6, 6, -2]} />
             <pointLight position={[6, -3, 0]} />
+          </group>
+          <group visible={props.globeState === GlobeState.Project}>
+            {props.globeState === GlobeState.Project ? <Oups /> : null}
+          </group>
+          <group visible={props.globeState === GlobeState.Other}>
+            {props.globeState === GlobeState.Other ? <Oups /> : null}
           </group>
         </group>
         <Html transform scale={0.2} position={[0, 0.2, 0]} rotation={[0, 0, 0]}>

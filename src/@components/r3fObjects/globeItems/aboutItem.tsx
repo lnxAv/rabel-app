@@ -57,7 +57,7 @@ const AboutItem = ({ ...props }: Props) => {
                 ]}
               />
             ) : null}
-            <div style={{ position: 'absolute', bottom: 0, right: '2px', opacity: 0.5 }}>
+            <div style={{ position: 'absolute', bottom: '-5px', right: '25px', opacity: 0.5 }}>
               beta-0.1
             </div>
           </div>
