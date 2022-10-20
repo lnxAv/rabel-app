@@ -1,10 +1,30 @@
 import Head from 'next/head';
-import React, { useEffect } from 'react';
-import styled from 'styled-components';
-import { TypeLine, TypePill, TypePlus } from '../../@components/htmlObjects/globeEffectHtml';
+import React, { useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
+import {
+  CircleText,
+  TypeLine,
+  TypePill,
+  TypePlus,
+} from '../../@components/htmlObjects/globeEffectHtml';
 
 import { XPage } from '../x-page';
 import R3f from './r3f';
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Rotate = styled.div`
+  animation: ${rotate} 5s linear infinite;
+  transform-origin: center;
+`;
 
 const Block = styled.div`
   position: absolute;
@@ -48,6 +68,7 @@ const CenteredText = styled.div`
 `;
 
 const Test: XPage = ({ title }: any) => {
+  const date = useRef(new Date());
   useEffect(() => {}, []);
   return (
     <>
@@ -63,16 +84,44 @@ const Test: XPage = ({ title }: any) => {
               fontFamily: 'project-space, monospace',
             }}
           >
-            12:15 p.m
+            `{date.current.toLocaleString('en-us', { weekday: 'short' })}
+            {date.current.getFullYear()}.
           </div>
-          <div className="navigation">xxx | xxx</div>
+          <div className="navigation">RABL | v0.1</div>
         </Header>
       </Block>
-      <Block style={{ top: 'calc(100vh - 70px)', padding: '0 15px' }}>
+      <Block style={{ position: 'relative', top: 'calc(100vh - 70px)', padding: '0 15px' }}>
         <div>
           <TypePlus size={35} />
           <TypeLine opacity={0.8} size={3} length={50} color="red" />
         </div>
+        <Rotate style={{ position: 'absolute', top: '-25px', right: '60px' }}>
+          <div style={{ position: 'relative', top: '-58px', right: '0px' }}>
+            <CircleText
+              text=" | SCROLL | SCROLL | "
+              arc={360}
+              radius="60px"
+              offset={0}
+              fontSize={15}
+              color="red"
+            />
+          </div>
+        </Rotate>
+        <div
+          style={{
+            content: ' ',
+            position: 'absolute',
+            top: '-40px',
+            right: '50px',
+            transform: 'rotate(-45deg)',
+            margin: 'auto',
+            width: '22px',
+            height: '22px',
+            borderLeft: '1px solid white',
+            borderBottom: '1px solid white',
+            opacity: '0.8',
+          }}
+        />
         <div style={{ borderTop: '1px solid red', padding: '0 17px' }} />
       </Block>
       <Block style={{ top: '180vh' }}>

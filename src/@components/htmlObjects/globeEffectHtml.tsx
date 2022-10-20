@@ -250,13 +250,14 @@ export const CircleText = ({
 }) => {
   const [characters, setCharacters] = useState(text?.split('') || []);
   const [degree, setDegree] = useState(arc / characters.length);
-  const [fixedRadius] = useState(typeof radius === 'number' ? `${radius}px` : radius);
+  const [fixedRadius, setRadius] = useState(typeof radius === 'number' ? `${radius}px` : radius);
 
   useEffect(() => {
     const newTextSplit = text?.split('') || [];
     setCharacters(newTextSplit);
     setDegree(arc / newTextSplit.length);
-  }, [text]);
+    setRadius(typeof radius === 'number' ? `${radius}px` : radius);
+  }, [text, radius]);
 
   return (
     <p>

@@ -1,8 +1,9 @@
-import { OrthographicCamera, Text, useScroll } from '@react-three/drei';
+import { Html, OrthographicCamera, Text, useScroll } from '@react-three/drei';
 import { extend, ReactThreeFiber, useFrame, useThree } from '@react-three/fiber';
 import { MeshLine, MeshLineMaterial } from 'meshline';
 import React, { useEffect, useRef, useState } from 'react';
 import { Box3, MathUtils, Vector3 } from 'three';
+import TypewriterComponent from 'typewriter-effect';
 
 import { BoundaryHover } from '../../@components/r3fObjects/BoundaryHover';
 import Globe, { GlobeSpinningFunc, GlobeState } from '../../@components/r3fObjects/globe';
@@ -304,6 +305,57 @@ const R3f: XR3f<any> = () => {
   return (
     <>
       <OrthographicCamera />
+      <group position={[0, 0, 1]}>
+        <Html
+          style={{
+            width: '100vw',
+            fontSize: '29px',
+            fontFamily: 'dot16, monospace',
+            left: '-50vw',
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '50vw',
+              margin: 'auto',
+              padding: '0 5px',
+              textAlign: 'left',
+              borderLeft: '1px solid red',
+              background: 'rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <div>Hi, I am</div>
+            <div style={{ position: 'relative', paddingLeft: '32px' }}>
+              <div style={{ position: 'absolute', left: '0px' }}>
+                <p>{'>'}</p>
+              </div>
+              <span>
+                <TypewriterComponent
+                  options={{ loop: true, delay: 250, deleteSpeed: 350, cursor: '&block;' }}
+                  onInit={(typewriter) => {
+                    typewriter
+                      .typeString('Pierre')
+                      .deleteAll()
+                      .typeString('a Programmer')
+                      .deleteAll()
+                      .changeDelay(180)
+                      .typeString('forever a student')
+                      .deleteAll()
+                      .changeDelay(250)
+                      .typeString('a tinkerer')
+                      .deleteAll()
+                      .typeString('Rabel')
+                      .start();
+                  }}
+                />
+              </span>
+            </div>
+          </div>
+        </Html>
+      </group>
       <Globe
         ref={globeGroupRef}
         globeText={hovered}

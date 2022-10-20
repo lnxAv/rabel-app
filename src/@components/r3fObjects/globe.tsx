@@ -72,11 +72,11 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
       const path = direction === 'left' ? 1 : -1;
       const rad = MathUtils.degToRad(360 * spin * path);
       isSpinning.current = true;
-      spinningTo.current = rad + bodyRef.current.rotation.y;
+      spinningTo.current = rad + globeRef.current.rotation.y;
     } else {
       isSpinning.current = false;
-      globeRef.current.rotation.y -= spinningTo.current;
-      contentRef.current.rotation.y = globeRef.current.rotation.y;
+      globeRef.current.rotation.y = 0;
+      contentRef.current.rotation.y = 0;
     }
   };
 
