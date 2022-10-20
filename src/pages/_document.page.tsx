@@ -102,20 +102,6 @@ function DocumentHead() {
         type="font/woff"
         crossOrigin="anonymous"
       />
-      <link
-        rel="preload"
-        href="fonts/genesys.woff2"
-        as="font"
-        type="font/woff2"
-        crossOrigin="anonymous"
-      />
-      <link
-        rel="preload"
-        href="fonts/genesys.woff"
-        as="font"
-        type="font/woff"
-        crossOrigin="anonymous"
-      />
       {/* apple splash screen images */}
       {/*
         <link rel='apple-touch-startup-image' href='/images/apple_splash_2048.png' sizes='2048x2732' />
