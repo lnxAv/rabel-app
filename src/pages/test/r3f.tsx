@@ -309,7 +309,7 @@ const R3f: XR3f<any> = () => {
         <Html
           style={{
             width: '100vw',
-            fontSize: '29px',
+            fontSize: '27px',
             fontFamily: 'dot16, monospace',
             left: '-50vw',
             pointerEvents: 'none',
