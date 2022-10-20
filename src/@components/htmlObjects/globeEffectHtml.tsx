@@ -290,9 +290,9 @@ const GlobeEffectHtml = ({ ...props }: Props) => {
     const select = randomNumber(1, 2);
     switch (select) {
       case 1:
-        return <TypeDots size={8} />;
+        return <TypeDots size={3} />;
       case 2:
-        return <TypePlus size={15} rotate={!!randomNumber(0, 1)} />;
+        return <TypePlus size={7} rotate={!!randomNumber(0, 1)} />;
       default:
         return null;
     }
