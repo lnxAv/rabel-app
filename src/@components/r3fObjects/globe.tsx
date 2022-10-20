@@ -6,7 +6,6 @@ import { MathUtils } from 'three';
 import { GroupReffered } from '../../@helpers/types';
 import CartesianShader from '../../@styles/shader/cartesian/component';
 import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
-import { RhombicDodecaedronLines } from '../x/x-shapes/rhombic_dodecahedron';
 import AnimatedLine from './animatedLine';
 import AboutItem from './globeItems/aboutItem';
 import LoadingGlobe from './loadingGlobe';
@@ -275,14 +274,10 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
         <group ref={globeRef}>
           {/* @ts-ignore */}
           <Sphere args={[...Object.values(GlobeSettings.args)]} scale={GlobeSettings.defaultScale}>
-            <CartesianShader u={{ hue: [255, 0, 41], sharpness: 0.5, opacityA: 1.5 }} />
+            <CartesianShader
+              u={{ hue: [255, 0, 41], sharpness: 0.5, opacityA: 1.5, opacityB: 0.05 }}
+            />
           </Sphere>
-          <RhombicDodecaedronLines
-            color="rgb(255, 0, 41)"
-            scale={0.45}
-            opacity={0}
-            renderOrder={10}
-          />
           <group visible={props.globeState === GlobeState.Loading}>
             <LoadingGlobe
               phiLength={GlobeSettings.args.phiLength}

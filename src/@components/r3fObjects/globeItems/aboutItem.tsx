@@ -15,7 +15,7 @@ const AboutItem = ({ ...props }: Props) => {
       <Suspense fallback={<Html>XX</Html>}>
         <Model rotation={[0, -1.5, 0]} />
       </Suspense>
-      <Html>
+      <Html distanceFactor={8}>
         <div
           style={{
             display: `${props.visible ? 'flex' : 'none'}`,
