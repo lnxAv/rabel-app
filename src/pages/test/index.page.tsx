@@ -116,7 +116,7 @@ const Test: XPage = ({ title }: any) => {
         />
         <CenteredText
           style={{
-            fontSize: '50px',
+            fontSize: '25px',
             fontFamily: 'project-space, monospace',
           }}
         >
@@ -131,21 +131,35 @@ const Test: XPage = ({ title }: any) => {
         </CenteredText>
         <CenteredText
           style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '15px',
             fontSize: '25px',
             maxWidth: '550px',
             fontFamily: 'disket-mono-bold, monospace',
             letterSpacing: '6px',
           }}
         >
-          @Email $LinkdIn #Git
+          <div>
+            <a href="mailto:pierrew.rabel@gmail.com?subject = Feedback">@Email</a>
+          </div>
+          <div>
+            <a href="https://www.linkedin.com/in/pierrewrabel/">$LinkdIn</a>
+          </div>
+          <div>
+            <a href="https://github.com/lnxAv">#Git</a>
+          </div>
         </CenteredText>
         <CenteredText
           style={{ fontSize: '14px', maxWidth: '550px', fontFamily: 'dot16, monospace' }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent semper nisl elit, in
-          aliquet mi rutrum nec. Donec orci ipsum, faucibus sed maximus in, ultrices vel felis.{' '}
+          <span>
+            Thank you for your visit, this site has been created with care and passion. It is my
+            first of many projects with Three.js to come; this personal template built on thousands
+            of resources can be found <a href="https://github.com/lnxAv/r3f-basic">here</a>.
+          </span>
         </CenteredText>
-        <CenteredText style={{ fontSize: '12px' }}>XXXX™</CenteredText>
+        <CenteredText style={{ fontSize: '12px' }}>- RABL</CenteredText>
       </Block>
     </>
   );
@@ -161,8 +175,8 @@ export async function getStaticProps({ locale }: any) {
 
 R3f.scrollControls = {
   pages: 4,
-  damping: 5,
-  distance: 1.5,
+  damping: 8,
+  distance: 2,
   scrollR3f: true,
 };
 
