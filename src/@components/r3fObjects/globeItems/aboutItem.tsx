@@ -13,7 +13,7 @@ const AboutItem = ({ ...props }: Props) => {
   return (
     <mesh {...props}>
       <Suspense fallback={<Html>XX</Html>}>
-        <Model rotation={[0, -3, 0]} />
+        <Model rotation={[0, -1.5, 0]} />
       </Suspense>
       <Html>
         <div
