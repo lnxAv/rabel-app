@@ -59,7 +59,7 @@ const R3f: XR3f<any> = () => {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const data = useScroll();
-  const [{ width, height }] = useThree((s) => [s.viewport, s.mouse]);
+  const [{ width, height }, { height: pHeight }] = useThree((s) => [s.viewport, s.size]);
 
   useEffect(() => {
     if (hovered) document.body.style.cursor = 'pointer';
@@ -324,6 +324,9 @@ const R3f: XR3f<any> = () => {
             renderOrder={-5}
             anchorX="center"
             anchorY="middle"
+            onClick={() => {
+              data.el.scroll(0, pHeight * (2.7 * 2));
+            }}
             onPointerUp={() => handleOnSelected(elem)}
             onPointerEnter={() => handleOnHovered(elem)}
             onPointerDown={() => handleOnHovered(elem)}
