@@ -16,7 +16,15 @@ const AboutItem = ({ ...props }: Props) => {
         <Model rotation={[0, -3, 0]} />
       </Suspense>
       <Html>
-        <div style={{ position: 'relative', width: '100vw', height: 'auto', left: '-50vw' }}>
+        <div
+          style={{
+            display: `${props.visible ? 'flex' : 'none'}`,
+            position: 'relative',
+            width: '100vw',
+            height: 'auto',
+            left: '-50vw',
+          }}
+        >
           <div
             style={{
               position: 'relative',

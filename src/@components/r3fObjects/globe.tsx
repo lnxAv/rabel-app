@@ -292,14 +292,8 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
         </group>
 
         <group ref={contentRef} visible={props.globeState !== GlobeState.Loading}>
-          <group
-            visible={
-              props.globeState === GlobeState.About || currentState.current === GlobeState.About
-            }
-          >
-            {props.globeState === GlobeState.About || currentState.current === GlobeState.About ? (
-              <AboutItem />
-            ) : null}
+          <group visible={props.globeState === GlobeState.About}>
+            <AboutItem visible={props.globeState === GlobeState.About} />
             <pointLight position={[-5, 0, 0]} />
             <pointLight position={[5, -2, 0]} rotation={[1, 2, 0]} />
           </group>

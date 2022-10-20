@@ -1,11 +1,11 @@
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useRef } from 'react';
-import { MeshReffered } from '../../@helpers/types';
 
+import { usePoolStore } from '../../@helpers/poolStore';
+import { MeshReffered } from '../../@helpers/types';
 import GlobeEffectHtml from '../htmlObjects/globeEffectHtml';
 import { PoolableComponent, PoolItemCreationProps, useObjectPool } from '../x/extension/pool/pool';
-import { usePoolStore } from '../../@helpers/poolStore';
 
 type Props = {
   phiLength: number;
