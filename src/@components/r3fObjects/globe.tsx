@@ -1,4 +1,4 @@
-import { Cylinder, Html, Sphere } from '@react-three/drei';
+import { Html, Sphere } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
@@ -8,6 +8,7 @@ import CartesianShader from '../../@styles/shader/cartesian/component';
 import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
 import { RhombicDodecaedronLines } from '../x/x-shapes/rhombic_dodecahedron';
 import AnimatedLine from './animatedLine';
+import AboutItem from './globeItems/aboutItem';
 import LoadingGlobe from './loadingGlobe';
 
 export type GlobeSpinningFunc = (direction: 'left' | 'right' | null, amount?: number) => void;
@@ -289,9 +290,18 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
             />
           </group>
         </group>
+
         <group ref={contentRef} visible={props.globeState !== GlobeState.Loading}>
-          <group visible={props.globeState === GlobeState.About}>
-            <Cylinder />
+          <group
+            visible={
+              props.globeState === GlobeState.About || currentState.current === GlobeState.About
+            }
+          >
+            {props.globeState === GlobeState.About || currentState.current === GlobeState.About ? (
+              <AboutItem />
+            ) : null}
+            <pointLight position={[-5, 0, 0]} />
+            <pointLight position={[5, -2, 0]} rotation={[1, 2, 0]} />
           </group>
         </group>
         <Html transform scale={0.2} position={[0, 0.2, 0]} rotation={[0, 0, 0]}>

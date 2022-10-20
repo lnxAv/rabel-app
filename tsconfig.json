@@ -15,6 +15,6 @@
     "jsx": "preserve",
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js", "x-declaration.d.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".eslintrc.js", "x-declaration.d.ts", "src/@components/r3fObjects/globeItems/model.jsx"],
   "exclude": ["node_modules"]
 }

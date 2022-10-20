@@ -57,7 +57,7 @@ export const XCanvas: React.FC<XCanvasProps & CanvasProps> = ({
       <button type="button" id="canvas-toggle" onClick={handleSelection}>
         {canvasId || ''}
       </button>
-      <Canvas {...props} style={{ mixBlendMode: 'difference' }}>
+      <Canvas {...props} performance={{ min: 0.1 }} gl={{ antialias: false }}>
         <Preload />
         <Suspense>
           {color ? <color attach="background" args={[color]} /> : null}

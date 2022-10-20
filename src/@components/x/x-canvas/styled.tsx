@@ -11,12 +11,13 @@ const XCanvasWrapper = styled.div<{ devMode: boolean }>`
     position: absolute;
     display: none;
   }
-  ${(props) => (props.devMode
-    ? `
+  ${(props) =>
+    props.devMode
+      ? `
   border: 1px solid #181c20;
   background: #181c20;
   font-size: 12px;
-  font-family: monospace;
+  font-family: dot16, monospace;
   button#canvas-toggle {
     display: inline;
     z-index: 1000;
@@ -25,7 +26,7 @@ const XCanvasWrapper = styled.div<{ devMode: boolean }>`
     border-bottom-right-radius: 5px;
   }
 `
-    : '')}
+      : ''}
 `;
 export const fullScreenStyle: CSSProperties = {
   position: 'absolute',
