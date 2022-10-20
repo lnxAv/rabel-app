@@ -162,7 +162,7 @@ export async function getStaticProps({ locale }: any) {
 R3f.scrollControls = {
   pages: 4,
   damping: 5,
-  distance: 3,
+  distance: 1.5,
   scrollR3f: true,
 };
 

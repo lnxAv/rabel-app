@@ -29,6 +29,7 @@ const AboutItem = ({ ...props }: Props) => {
             style={{
               position: 'relative',
               fontSize: '32x',
+              minWidth: '50vw',
               maxWidth: '700px',
               margin: 'auto',
               padding: '10px 5vw',
@@ -46,14 +47,16 @@ const AboutItem = ({ ...props }: Props) => {
             >
               Pierre
             </div>
-            <TypeWriting
-              timedLines={[
-                {
-                  text: string,
-                  time: string.length * 25,
-                },
-              ]}
-            />
+            {props.visible ? (
+              <TypeWriting
+                timedLines={[
+                  {
+                    text: string,
+                    time: string.length * 25,
+                  },
+                ]}
+              />
+            ) : null}
             <div style={{ position: 'absolute', bottom: 0, right: '2px', opacity: 0.5 }}>
               beta-0.1
             </div>
