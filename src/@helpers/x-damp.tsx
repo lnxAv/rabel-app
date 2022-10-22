@@ -15,7 +15,7 @@ function precisionRound(number: number, precision: number) {
   return Math.round(n * factor) / factor;
 }
 
-export const xDamp: XDamp = (from, to, lambda, delta, precision = 3) => {
+export const xDamp: XDamp = (from, to, lambda, delta, precision = 5) => {
   if (from === to) return from;
   const result = precisionRound(MathUtils.damp(from, to, lambda, delta), precision);
   return result;
