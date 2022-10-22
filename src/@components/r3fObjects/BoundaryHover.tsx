@@ -1,9 +1,10 @@
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import React, { useEffect, useRef, useState } from 'react';
-import { Box3, MathUtils, Vector3 } from 'three';
+import { Box3, Vector3 } from 'three';
 
 import { GroupReffered, MeshReffered } from '../../@helpers/types';
+import { xDamp } from '../../@helpers/x-damp';
 
 type Props = {
   from?: Vector3;
@@ -86,19 +87,9 @@ export const BoundaryHover = ({ from, to, box }: Props) => {
           defaultTotal++;
         } else {
           // eslint-disable-next-line no-param-reassign
-          elem.position.x = MathUtils.damp(
-            elem.position.x,
-            boundaryBorderGoals.current[i].x,
-            5,
-            delta
-          );
+          elem.position.x = xDamp(elem.position.x, boundaryBorderGoals.current[i].x, 5, delta);
           // eslint-disable-next-line no-param-reassign
-          elem.position.y = MathUtils.damp(
-            elem.position.y,
-            boundaryBorderGoals.current[i].y,
-            5,
-            delta
-          );
+          elem.position.y = xDamp(elem.position.y, boundaryBorderGoals.current[i].y, 5, delta);
         }
 
         if (defaultTotal >= defaultBoundary.length) {
@@ -111,13 +102,13 @@ export const BoundaryHover = ({ from, to, box }: Props) => {
     if (!boundaryCenterDone) {
       // Move the boundary's center (from - to)
       if (boundaryGroupRef.current && to) {
-        boundaryGroupRef.current.position.x = MathUtils.damp(
+        boundaryGroupRef.current.position.x = xDamp(
           boundaryGroupRef.current.position.x,
           to.x,
           8,
           delta
         );
-        boundaryGroupRef.current.position.y = MathUtils.damp(
+        boundaryGroupRef.current.position.y = xDamp(
           boundaryGroupRef.current.position.y,
           to.y,
           10,

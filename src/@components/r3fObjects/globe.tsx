@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MathUtils } from 'three';
 
 import { GroupReffered } from '../../@helpers/types';
+import { xDamp } from '../../@helpers/x-damp';
 import CartesianShader from '../../@styles/shader/cartesian/component';
 import { BreathingBox, CircleText } from '../htmlObjects/globeEffectHtml';
 import AnimatedLine from './animatedLine';
@@ -139,7 +140,7 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     }
   };
 
-  const a = MathUtils.damp; // short
+  const a = xDamp; // short
 
   const frameStateLoading = (delta: number) => {
     if (!bodyRef.current) return;

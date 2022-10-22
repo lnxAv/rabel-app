@@ -8,6 +8,7 @@ import TypewriterComponent from 'typewriter-effect';
 import { BoundaryHover } from '../../@components/r3fObjects/BoundaryHover';
 import Globe, { GlobeSpinningFunc, GlobeState } from '../../@components/r3fObjects/globe';
 import { GroupReffered, MeshReffered } from '../../@helpers/types';
+import { xDamp } from '../../@helpers/x-damp';
 import { XR3f } from '../x-page';
 
 extend({ MeshLine, MeshLineMaterial });
@@ -73,7 +74,7 @@ const R3f: XR3f<any> = () => {
     if (!globeGroupRef.current) return;
     if (a2 < 0.001) {
       const defaultY = globeGroupRef.current.userData.defaultPosition[1];
-      globeGroupRef.current.position.y = MathUtils.damp(
+      globeGroupRef.current.position.y = xDamp(
         globeGroupRef.current.position.y,
         defaultY,
         2,
@@ -83,14 +84,9 @@ const R3f: XR3f<any> = () => {
       const a2Pos = -height * a2 + 0.6;
       const isReady = textGroupRef.current.position.y - 1.5 > globeGroupRef.current.position.y;
       if (!isReady) {
-        globeGroupRef.current.position.y = MathUtils.damp(
-          globeGroupRef.current.position.y,
-          a2Pos,
-          2,
-          delta
-        );
+        globeGroupRef.current.position.y = xDamp(globeGroupRef.current.position.y, a2Pos, 2, delta);
       } else {
-        globeGroupRef.current.position.y = MathUtils.damp(
+        globeGroupRef.current.position.y = xDamp(
           globeGroupRef.current.position.y,
           Math.max(
             Math.min(
@@ -110,14 +106,9 @@ const R3f: XR3f<any> = () => {
     if (!textGroupRef.current) return;
     // horizontal animation
     if (a1 < 0.001) {
-      textGroupRef.current.position.x = MathUtils.damp(
-        textGroupRef.current.position.x,
-        width * 2,
-        4,
-        delta
-      );
+      textGroupRef.current.position.x = xDamp(textGroupRef.current.position.x, width * 2, 4, delta);
     } else {
-      textGroupRef.current.position.x = MathUtils.damp(
+      textGroupRef.current.position.x = xDamp(
         textGroupRef.current.position.x,
         (a1 - 1) * -width * 2,
         8,
@@ -130,7 +121,7 @@ const R3f: XR3f<any> = () => {
       if (!textRef?.position) return false;
       if (a2 < 0.001) {
         /* eslint-disable no-param-reassign */
-        textRef.position.y = MathUtils.damp(textRef.position.y, 0, 4, delta);
+        textRef.position.y = xDamp(textRef.position.y, 0, 4, delta);
       } else {
         const isReady = textRef.position.y > 0.9 * -i;
         const isSelected = selected.current === textRef.userData.selection;
@@ -139,9 +130,9 @@ const R3f: XR3f<any> = () => {
           (!isSelected && !isReady) ||
           topOffset > textGroupRef.current.position.y - i - 1
         ) {
-          textRef.position.y = MathUtils.damp(textRef.position.y, Math.max(-i, -i * a2), 8, delta);
+          textRef.position.y = xDamp(textRef.position.y, Math.max(-i, -i * a2), 8, delta);
         } else if (isSelected && topOffset < textGroupRef.current.position.y - i - 1) {
-          textRef.position.y = MathUtils.damp(
+          textRef.position.y = xDamp(
             textRef.position.y,
             Math.max(topOffset - textGroupRef.current.position.y + 1, -height * (data.pages - 3.3)),
             5,
@@ -163,8 +154,8 @@ const R3f: XR3f<any> = () => {
         if (!optionRef?.position) return false; // skip
         if (isGlobeReady.current) {
           optionRef.visible = true;
-          optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 1, 5, delta);
-          optionRef.rotation.x = MathUtils.damp(
+          optionRef.scale.x = xDamp(optionRef.scale.x, 1, 5, delta);
+          optionRef.rotation.x = xDamp(
             optionRef.rotation.x,
             MathUtils.radToDeg(0) * delta,
             5,
@@ -172,16 +163,11 @@ const R3f: XR3f<any> = () => {
           );
         } else if (!isGlobeReady.current && optionRef.visible) {
           // optionRef.visible = false;
-          optionRef.scale.x = MathUtils.damp(optionRef.scale.x, 0, 5, delta);
+          optionRef.scale.x = xDamp(optionRef.scale.x, 0, 5, delta);
           if (optionRef.scale.x <= 0.1) {
             optionRef.visible = false;
           }
-          optionRef.rotation.x = MathUtils.damp(
-            optionRef.rotation.x,
-            MathUtils.radToDeg(0.25),
-            5,
-            delta
-          );
+          optionRef.rotation.x = xDamp(optionRef.rotation.x, MathUtils.radToDeg(0.25), 5, delta);
         } else {
           optionRef.visible = false;
         }
@@ -189,7 +175,7 @@ const R3f: XR3f<any> = () => {
       });
       // Position
       if (textRef?.position)
-        optionGroupRef.current.position.y = MathUtils.damp(
+        optionGroupRef.current.position.y = xDamp(
           optionGroupRef.current.position.y,
           textRef.position.y + textOffset - 0.4,
           10,
