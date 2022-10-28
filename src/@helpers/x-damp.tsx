@@ -5,7 +5,9 @@ type XDamp = (
   to: number,
   lambda: number,
   delta: number,
-  precision?: number
+  precision?: number,
+  fixPrecision?: number,
+  onFix?: (to: number) => void
 ) => number;
 
 function precisionRound(number: number, precision: number) {
@@ -15,9 +17,21 @@ function precisionRound(number: number, precision: number) {
   return Math.round(n * factor) / factor;
 }
 
-export const xDamp: XDamp = (from, to, lambda, delta, precision = 7) => {
+export const xDamp: XDamp = (
+  from,
+  to,
+  lambda,
+  delta,
+  precision = 7,
+  fixPrecision = 0.1,
+  onFix = () => {}
+) => {
   if (from === to) return from;
   const result = precisionRound(MathUtils.damp(from, to, lambda, delta), precision);
+  if (Math.abs(to) - Math.abs(result) <= fixPrecision) {
+    onFix(to);
+    return to;
+  }
   return result;
 };
 export default xDamp;

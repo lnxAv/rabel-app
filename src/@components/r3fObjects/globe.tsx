@@ -61,7 +61,7 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     if (!windowFocus.current) {
       windowFocus.current = true;
     }
-    const newHorizontal = (pWidth - e.x) / pWidth;
+    const newHorizontal = (pWidth - e.x) / (pWidth / 2);
     horizontalRef.current = newHorizontal;
     const newVertical = (pHeight - e.y) / pHeight;
     verticalRef.current = newVertical;
@@ -71,13 +71,12 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     if (direction === 'left' || direction === 'right') {
       const spin = amount || 1;
       const path = direction === 'left' ? 1 : -1;
-      const rad = MathUtils.degToRad(360 * spin * path);
+      const toZero = (globeRef.current.rotation.y % 6.28319) * path;
+      const rad = 6.28319 * path * spin - toZero;
       isSpinning.current = true;
       spinningTo.current = rad + globeRef.current.rotation.y;
     } else {
       isSpinning.current = false;
-      globeRef.current.rotation.y = 0;
-      contentRef.current.rotation.y = 0;
     }
   };
 
@@ -126,13 +125,12 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
 
   const doSpinningFrame = (delta: number) => {
     if (isSpinning.current) {
-      const strength =
-        spinningTo.current > 0
-          ? Math.max(spinningTo.current / Math.PI, 10)
-          : Math.min(Math.abs(spinningTo.current) / Math.PI, -10);
-      const step = strength * delta;
-      globeRef.current.rotation.y += step;
-      contentRef.current.rotation.y = globeRef.current.rotation.y;
+      globeRef.current.rotation.y = MathUtils.damp(
+        globeRef.current.rotation.y,
+        spinningTo.current,
+        4,
+        delta
+      );
 
       if (globeRef.current.rotation.y.toPrecision(1) === spinningTo.current.toPrecision(1)) {
         startSpinning(null);
@@ -140,22 +138,20 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     }
   };
 
-  const a = xDamp; // short
-
   const frameStateLoading = (delta: number) => {
     if (!bodyRef.current) return;
     if (
       switchingStateTo.current === GlobeState.Loading ||
       switchingStateTo.current === GlobeState.Other
     ) {
-      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
-      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1, 4, delta);
-      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1, 4, delta);
-      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1, 4, delta);
+      bodyRef.current.position.y = xDamp(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = xDamp(bodyRef.current.scale.x, 1, 4, delta);
+      bodyRef.current.scale.y = xDamp(bodyRef.current.scale.y, 1, 4, delta);
+      bodyRef.current.scale.z = xDamp(bodyRef.current.scale.z, 1, 4, delta);
       // globeRef.current.scale.set(1, 1, 1);
-      globeRef.current.scale.x = a(globeRef.current.scale.x, 1, 4, delta);
-      globeRef.current.scale.y = a(globeRef.current.scale.y, 1, 4, delta);
-      globeRef.current.scale.z = a(globeRef.current.scale.z, 1, 4, delta);
+      globeRef.current.scale.x = xDamp(globeRef.current.scale.x, 1, 4, delta);
+      globeRef.current.scale.y = xDamp(globeRef.current.scale.y, 1, 4, delta);
+      globeRef.current.scale.z = xDamp(globeRef.current.scale.z, 1, 4, delta);
       // after x amount of time
       currentState.current = GlobeState.Loading;
       // switchingStateTo.current = null;
@@ -166,14 +162,14 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
     if (!bodyRef.current) return;
     if (switchingStateTo.current === GlobeState.About) {
       // body
-      bodyRef.current.position.y = a(bodyRef.current.position.y, 0.8, 4, delta);
-      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 0.7, 4, delta);
-      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 0.7, 4, delta);
-      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 0.7, 4, delta);
+      bodyRef.current.position.y = xDamp(bodyRef.current.position.y, 0.8, 4, delta);
+      bodyRef.current.scale.x = xDamp(bodyRef.current.scale.x, 0.7, 4, delta);
+      bodyRef.current.scale.y = xDamp(bodyRef.current.scale.y, 0.7, 4, delta);
+      bodyRef.current.scale.z = xDamp(bodyRef.current.scale.z, 0.7, 4, delta);
       // globe
-      globeRef.current.scale.x = a(globeRef.current.scale.x, 0, 4, delta);
-      globeRef.current.scale.y = a(globeRef.current.scale.y, 0, 4, delta);
-      globeRef.current.scale.z = a(globeRef.current.scale.z, 0, 4, delta);
+      globeRef.current.scale.x = xDamp(globeRef.current.scale.x, 0, 4, delta);
+      globeRef.current.scale.y = xDamp(globeRef.current.scale.y, 0, 4, delta);
+      globeRef.current.scale.z = xDamp(globeRef.current.scale.z, 0, 4, delta);
       // after x amount of time
       currentState.current = GlobeState.About;
       // switchingStateTo.current = null;
@@ -183,14 +179,14 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
   const frameStateTools = (delta: number) => {
     if (!bodyRef.current) return;
     if (switchingStateTo.current === GlobeState.Tools) {
-      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
-      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1, 4, delta);
-      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1, 4, delta);
-      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1, 4, delta);
+      bodyRef.current.position.y = xDamp(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = xDamp(bodyRef.current.scale.x, 1, 4, delta);
+      bodyRef.current.scale.y = xDamp(bodyRef.current.scale.y, 1, 4, delta);
+      bodyRef.current.scale.z = xDamp(bodyRef.current.scale.z, 1, 4, delta);
       // globeRef.current.scale.set(1, 1, 1);
-      globeRef.current.scale.x = a(globeRef.current.scale.x, 0.9, 4, delta);
-      globeRef.current.scale.y = a(globeRef.current.scale.y, 0.9, 4, delta);
-      globeRef.current.scale.z = a(globeRef.current.scale.z, 0.9, 4, delta);
+      globeRef.current.scale.x = xDamp(globeRef.current.scale.x, 0.9, 4, delta);
+      globeRef.current.scale.y = xDamp(globeRef.current.scale.y, 0.9, 4, delta);
+      globeRef.current.scale.z = xDamp(globeRef.current.scale.z, 0.9, 4, delta);
       // after x amount of time
       currentState.current = GlobeState.Tools;
       // switchingStateTo.current = null;
@@ -200,14 +196,14 @@ const Globe = React.forwardRef<GroupReffered, Props>((props, ref) => {
   const frameStateProjects = (delta: number) => {
     if (!bodyRef.current) return;
     if (switchingStateTo.current === GlobeState.Project) {
-      bodyRef.current.position.y = a(bodyRef.current.position.y, 0, 4, delta);
-      bodyRef.current.scale.x = a(bodyRef.current.scale.x, 1.1, 4, delta);
-      bodyRef.current.scale.y = a(bodyRef.current.scale.y, 1.1, 4, delta);
-      bodyRef.current.scale.z = a(bodyRef.current.scale.z, 1.1, 4, delta);
+      bodyRef.current.position.y = xDamp(bodyRef.current.position.y, 0, 4, delta);
+      bodyRef.current.scale.x = xDamp(bodyRef.current.scale.x, 1.1, 4, delta);
+      bodyRef.current.scale.y = xDamp(bodyRef.current.scale.y, 1.1, 4, delta);
+      bodyRef.current.scale.z = xDamp(bodyRef.current.scale.z, 1.1, 4, delta);
       // globeRef.current.scale.set(1, 1, 1);
-      globeRef.current.scale.x = a(globeRef.current.scale.x, 1.1, 4, delta);
-      globeRef.current.scale.y = a(globeRef.current.scale.y, 1.1, 4, delta);
-      globeRef.current.scale.z = a(globeRef.current.scale.z, 1.1, 4, delta);
+      globeRef.current.scale.x = xDamp(globeRef.current.scale.x, 1.1, 4, delta);
+      globeRef.current.scale.y = xDamp(globeRef.current.scale.y, 1.1, 4, delta);
+      globeRef.current.scale.z = xDamp(globeRef.current.scale.z, 1.1, 4, delta);
       // after x amount of time
       currentState.current = GlobeState.Project;
       // switchingStateTo.current = null;

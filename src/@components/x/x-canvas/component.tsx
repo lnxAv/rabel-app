@@ -59,8 +59,7 @@ export const XCanvas: React.FC<XCanvasProps & CanvasProps> = ({
       </button>
       <Canvas
         {...props}
-        performance={{ min: 0.1 }}
-        gl={{ antialias: false }}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
         style={{ mixBlendMode: 'difference' }}
       >
         <Preload />
