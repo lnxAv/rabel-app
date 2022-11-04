@@ -418,7 +418,7 @@ const R3f: XR3f<any> = () => {
               fillOpacity={hovered === elem ? 1 : 0}
               strokeOpacity={hovered === elem ? 1 : 1}
             >
-              {elem}
+              {`${elem}`}
             </Text>
           ))}
         </group>

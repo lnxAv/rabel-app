@@ -23,7 +23,7 @@ export const xDamp: XDamp = (
   lambda,
   delta,
   precision = 7,
-  fixPrecision = 0.1,
+  fixPrecision = 0.01,
   onFix = () => {}
 ) => {
   if (from === to) return from;
